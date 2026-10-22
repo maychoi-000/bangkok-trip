@@ -13,7 +13,7 @@
     }
 
     body {
-      background: #f2ebe1; /* 米白色外層背景 */
+      background: #f2ebe1;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -21,12 +21,11 @@
       padding: 10px;
     }
 
-    /* 手機外框 */
     .app-container {
       max-width: 400px;
       width: 100%;
       height: 780px;
-      background: #fdfaf5; /* 米白主背景 */
+      background: #fdfaf5;
       border-radius: 42px;
       box-shadow: 0 20px 40px rgba(200, 170, 150, 0.25), 0 8px 16px rgba(0, 0, 0, 0.05);
       overflow: hidden;
@@ -36,7 +35,6 @@
       border: 2px solid #f0e4d8;
     }
 
-    /* 頂部狀態模擬 */
     .status-bar {
       display: flex;
       justify-content: space-between;
@@ -47,7 +45,6 @@
       background: #fdfaf5;
     }
 
-    /* 頁面標題 */
     .app-header {
       padding: 8px 20px 12px;
       display: flex;
@@ -80,7 +77,6 @@
       transition: 0.3s;
     }
 
-    /* 主要內容滾動區 */
     .main-content {
       flex: 1;
       overflow-y: auto;
@@ -90,16 +86,9 @@
       scrollbar-color: #f0c8b8 #f5ece2;
     }
 
-    .main-content::-webkit-scrollbar {
-      width: 5px;
-    }
+    .main-content::-webkit-scrollbar { width: 5px; }
+    .main-content::-webkit-scrollbar-thumb { background: #f0c8b8; border-radius: 10px; }
 
-    .main-content::-webkit-scrollbar-thumb {
-      background: #f0c8b8;
-      border-radius: 10px;
-    }
-
-    /* 卡片設計 */
     .card {
       background: #ffffff;
       border-radius: 26px;
@@ -107,7 +96,6 @@
       margin-bottom: 18px;
       box-shadow: 0 6px 18px rgba(220, 190, 170, 0.18), 0 2px 6px rgba(230, 200, 180, 0.12);
       border: 1px solid #f0e4d8;
-      transition: transform 0.1s ease;
     }
 
     .card-title {
@@ -122,11 +110,8 @@
       border-bottom: 2px dotted #f0d9cc;
     }
 
-    .card-title i {
-      font-size: 20px;
-    }
+    .card-title i { font-size: 20px; }
 
-    /* 按鈕樣式 */
     button, .btn {
       background: #ffb6c9;
       border: none;
@@ -145,10 +130,7 @@
       letter-spacing: 0.3px;
     }
 
-    button:active {
-      transform: scale(0.96);
-      background: #f79eb6;
-    }
+    button:active { transform: scale(0.96); background: #f79eb6; }
 
     button.secondary {
       background: #f5ece2;
@@ -156,12 +138,8 @@
       box-shadow: 0 2px 6px rgba(230, 200, 180, 0.4);
     }
 
-    button.small {
-      padding: 5px 12px;
-      font-size: 11px;
-    }
+    button.small { padding: 5px 10px; font-size: 11px; }
 
-    /* 行程按鈕群組 */
     .day-tabs {
       display: flex;
       flex-wrap: wrap;
@@ -188,11 +166,6 @@
       box-shadow: 0 4px 8px rgba(255, 140, 170, 0.4);
     }
 
-    .day-tab:active {
-      transform: scale(0.95);
-    }
-
-    /* 行程列表 */
     .itinerary-list {
       display: flex;
       flex-direction: column;
@@ -251,12 +224,8 @@
       flex-shrink: 0;
     }
 
-    .map-link:active {
-      background: #ffb6c9;
-      color: white;
-    }
+    .map-link:active { background: #ffb6c9; color: white; }
 
-    /* 表單元素 */
     input, select, textarea {
       background: #faf6f0;
       border: 1.5px solid #f0ddd2;
@@ -282,21 +251,11 @@
       font-weight: 500;
     }
 
-    .form-row {
-      margin-bottom: 12px;
-    }
+    .form-row { margin-bottom: 12px; }
 
-    .flex-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
+    .flex-row { display: flex; gap: 8px; align-items: center; }
+    .flex-row > * { flex: 1; }
 
-    .flex-row > * {
-      flex: 1;
-    }
-
-    /* 記帳項目 */
     .expense-item {
       background: #faf7f1;
       border-radius: 20px;
@@ -319,30 +278,11 @@
       margin-bottom: 6px;
     }
 
-    .expense-name {
-      font-weight: 600;
-      color: #b85c7a;
-    }
+    .expense-name { font-weight: 600; color: #b85c7a; }
+    .expense-amount { font-weight: 600; color: #e06b8e; }
+    .expense-detail { font-size: 11px; color: #937a83; margin-bottom: 4px; }
+    .expense-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 6px; }
 
-    .expense-amount {
-      font-weight: 600;
-      color: #e06b8e;
-    }
-
-    .expense-detail {
-      font-size: 11px;
-      color: #937a83;
-      margin-bottom: 4px;
-    }
-
-    .expense-actions {
-      display: flex;
-      gap: 6px;
-      justify-content: flex-end;
-      margin-top: 6px;
-    }
-
-    /* 結算卡片 */
     .settle-card {
       background: #faf3ec;
       border-radius: 18px;
@@ -352,34 +292,16 @@
       border: 1px dashed #ffb6c9;
     }
 
-    /* 匯率計算器 */
-    .rate-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
+    .rate-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .rate-row input { text-align: center; }
+    .rate-arrow { color: #ffb6c9; font-weight: 600; font-size: 18px; }
 
-    .rate-row input {
-      text-align: center;
-    }
+    .hidden { display: none !important; }
 
-    .rate-arrow {
-      color: #ffb6c9;
-      font-weight: 600;
-      font-size: 18px;
-    }
-
-    /* 隱藏 */
-    .hidden {
-      display: none !important;
-    }
-
-    /* 底部導航 */
     .bottom-nav {
       display: flex;
       justify-content: space-around;
-      padding: 10px 0 14px;
+      padding: 8px 0 12px;
       background: #fdfaf5;
       border-top: 2px solid #f0e4d8;
       border-radius: 0 0 42px 42px;
@@ -390,11 +312,11 @@
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      font-size: 10px;
+      font-size: 9px;
       color: #b89a8a;
       background: none;
       border: none;
-      padding: 4px 12px;
+      padding: 4px 6px;
       border-radius: 20px;
       box-shadow: none;
     }
@@ -405,17 +327,9 @@
       background: #f7ede4;
     }
 
-    .nav-item i {
-      font-size: 20px;
-      line-height: 1;
-    }
+    .nav-item i { font-size: 19px; line-height: 1; }
+    .nav-item:active { transform: scale(0.94); background: #f5ece2; }
 
-    .nav-item:active {
-      transform: scale(0.94);
-      background: #f5ece2;
-    }
-
-    /* 小提示 */
     .hint {
       font-size: 10px;
       color: #b0a0a6;
@@ -432,25 +346,90 @@
       margin-bottom: 10px;
       display: inline-block;
     }
+
+    /* 文件列表 */
+    .file-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #faf7f1;
+      border-radius: 16px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      border: 1px solid #f0e4d8;
+    }
+
+    .file-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #f5ece2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .file-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+    }
+
+    .file-info { flex: 1; min-width: 0; }
+
+    .file-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #a0526e;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .file-meta {
+      font-size: 10px;
+      color: #b08a95;
+      margin-top: 2px;
+    }
+
+    .file-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+    .upload-zone {
+      border: 2px dashed #f0d9cc;
+      border-radius: 20px;
+      padding: 18px;
+      text-align: center;
+      background: #faf7f1;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .upload-zone:active { background: #f5ece2; }
+
+    .upload-zone .up-icon { font-size: 32px; }
+    .upload-zone .up-title { font-size: 13px; color: #b85c7a; font-weight: 600; margin-top: 6px; }
+    .upload-zone .up-sub { font-size: 11px; color: #b08a95; margin-top: 4px; }
   </style>
 </head>
 <body>
 <div class="app-container">
-  <!-- 狀態列 -->
   <div class="status-bar">
     <span>🇹🇭 曼谷 2026</span>
     <span id="saveStatus">已儲存</span>
   </div>
 
-  <!-- 標題 -->
   <div class="app-header">
     <h1><span>🧸</span> 曼谷旅帳</h1>
     <div class="save-indicator" id="syncIndicator">🔄 自動儲存</div>
   </div>
 
-  <!-- 主要內容 (分頁切換) -->
   <div class="main-content" id="mainContent">
-    <!-- 行程表分頁 -->
+    <!-- 行程表 -->
     <div id="tab-itinerary" class="tab-pane">
       <div class="card">
         <div class="card-title"><i>📅</i> 每日行程</div>
@@ -480,7 +459,7 @@
       </div>
     </div>
 
-    <!-- 地圖分頁 -->
+    <!-- 地圖 -->
     <div id="tab-map" class="tab-pane hidden">
       <div class="card">
         <div class="card-title"><i>🗺️</i> 地圖與交通</div>
@@ -489,7 +468,7 @@
       </div>
     </div>
 
-    <!-- 記帳分頁 -->
+    <!-- 記帳 -->
     <div id="tab-expense" class="tab-pane hidden">
       <div class="card">
         <div class="card-title"><i>💰</i> 新增支出</div>
@@ -549,7 +528,7 @@
       </div>
     </div>
 
-    <!-- 匯率分頁 -->
+    <!-- 匯率 -->
     <div id="tab-rate" class="tab-pane hidden">
       <div class="card">
         <div class="card-title"><i>💱</i> 日圓 ↔ 港幣 換算</div>
@@ -573,6 +552,25 @@
         <p style="font-size:14px; color:#b85c7a; text-align:center;" id="currentRateDisplay">1 HKD = 20.5 JPY</p>
       </div>
     </div>
+
+    <!-- 文件 -->
+    <div id="tab-files" class="tab-pane hidden">
+      <div class="card">
+        <div class="card-title"><i>📁</i> 上載截圖 / 文件</div>
+        <div class="upload-zone" id="uploadZone">
+          <div class="up-icon">📤</div>
+          <div class="up-title">撳一下選擇檔案</div>
+          <div class="up-sub">支援 PDF、JPG、PNG 等圖片・可一次選多個</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*,application/pdf" multiple style="display:none;">
+        <p class="hint" style="margin-top:8px;">單一檔案上限 20MB，檔案儲存在此瀏覽器</p>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i>🗂️</i> 已上載文件</div>
+        <div id="fileList"></div>
+      </div>
+    </div>
   </div>
 
   <!-- 底部導航 -->
@@ -581,6 +579,7 @@
     <button class="nav-item" data-tab="map"><i>🗺️</i> 地圖</button>
     <button class="nav-item" data-tab="expense"><i>💰</i> 記帳</button>
     <button class="nav-item" data-tab="rate"><i>💱</i> 匯率</button>
+    <button class="nav-item" data-tab="files"><i>📁</i> 文件</button>
   </div>
 </div>
 
@@ -592,106 +591,50 @@
     {
       name: 'Day 0｜11/26',
       items: [
-        {
-          place: '素萬那普機場 Suvarnabhumi Airport（23:15 抵達 EK385）',
-          mapUrl: MAP_SEARCH + 'Suvarnabhumi+Airport+Bangkok',
-          transport: '抵達後通關取行李，前往酒店 Check-in'
-        },
-        {
-          place: 'Cross Vibe Bangkok Sukhumvit（BTS On Nut）',
-          mapUrl: MAP_SEARCH + 'Cross+Vibe+Bangkok+Sukhumvit',
-          transport: 'Airport Rail Link 至 Phaya Thai 轉 BTS 至 On Nut 站 3 號出口；或 Grab 直達約 30–40 分鐘'
-        }
+        { place: '素萬那普機場 Suvarnabhumi Airport（23:15 抵達 EK385）', mapUrl: MAP_SEARCH + 'Suvarnabhumi+Airport+Bangkok', transport: '抵達後通關取行李，前往酒店 Check-in' },
+        { place: 'Cross Vibe Bangkok Sukhumvit（BTS On Nut）', mapUrl: MAP_SEARCH + 'Cross+Vibe+Bangkok+Sukhumvit', transport: 'Airport Rail Link 至 Phaya Thai 轉 BTS 至 On Nut 站 3 號出口；或 Grab 直達約 30–40 分鐘' }
       ]
     },
     {
       name: 'Day 1｜11/27',
       items: [
-        {
-          place: 'QSNCC 領取選手包（12:00–15:00）',
-          mapUrl: MAP_SEARCH + 'Queen+Sirikit+National+Convention+Centre+Bangkok',
-          transport: 'MRT Queen Sirikit National Convention Centre 站 3 號出口，步行約 3 分鐘'
-        },
-        {
-          place: 'CentralWorld / Chit Lom 逛街（15:30–19:00）',
-          mapUrl: MAP_SEARCH + 'CentralWorld+Bangkok',
-          transport: 'BTS Chit Lom 站 2 號出口，沿 Skywalk 步行約 5 分鐘｜推薦 Zara、Uniqlo、H&M'
-        },
-        {
-          place: 'Asok 一帶晚餐',
-          mapUrl: MAP_SEARCH + 'Terminal+21+Asok+Bangkok',
-          transport: 'BTS Asok 站 3 號出口／MRT Sukhumvit 站 3 號出口步行 2 分鐘｜推薦 Pad Thai、Mango Sticky Rice'
-        }
+        { place: 'QSNCC 領取選手包（12:00–15:00）', mapUrl: MAP_SEARCH + 'Queen+Sirikit+National+Convention+Centre+Bangkok', transport: 'MRT Queen Sirikit National Convention Centre 站 3 號出口，步行約 3 分鐘' },
+        { place: 'CentralWorld / Chit Lom 逛街（15:30–19:00）', mapUrl: MAP_SEARCH + 'CentralWorld+Bangkok', transport: 'BTS Chit Lom 站 2 號出口，沿 Skywalk 步行約 5 分鐘｜推薦 Zara、Uniqlo、H&M' },
+        { place: 'Asok 一帶晚餐', mapUrl: MAP_SEARCH + 'Terminal+21+Asok+Bangkok', transport: 'BTS Asok 站 3 號出口／MRT Sukhumvit 站 3 號出口步行 2 分鐘｜推薦 Pad Thai、Mango Sticky Rice' }
       ]
     },
     {
       name: 'Day 2｜11/28',
       items: [
-        {
-          place: 'ICONSIAM 逛街 + 河畔（10:00–16:00）',
-          mapUrl: MAP_SEARCH + 'ICONSIAM+Bangkok',
-          transport: 'BTS Saphan Taksin 站 2 號出口 → 轉 Gold Line 至 Charoen Nakhon 站 1 號出口｜推薦 LV、Gucci、Apple、Thai brands'
-        },
-        {
-          place: '河畔散步拍照（16:00–18:00）',
-          mapUrl: MAP_SEARCH + 'ICONSIAM+River+Park+Bangkok',
-          transport: 'ICONSIAM 河濱公園 River Park 沿昭披耶河步道漫步'
-        },
-        {
-          place: 'Tichuca Rooftop Bar 屋頂酒吧',
-          mapUrl: MAP_SEARCH + 'Tichuca+Rooftop+Bar+Bangkok',
-          transport: 'BTS Thong Lo 站 3 號出口步行約 8 分鐘，T-One Building 46 樓'
-        }
+        { place: 'ICONSIAM 逛街 + 河畔（10:00–16:00）', mapUrl: MAP_SEARCH + 'ICONSIAM+Bangkok', transport: 'BTS Saphan Taksin 站 2 號出口 → 轉 Gold Line 至 Charoen Nakhon 站 1 號出口｜推薦 LV、Gucci、Apple、Thai brands' },
+        { place: '河畔散步拍照（16:00–18:00）', mapUrl: MAP_SEARCH + 'ICONSIAM+River+Park+Bangkok', transport: 'ICONSIAM 河濱公園 River Park 沿昭披耶河步道漫步' },
+        { place: 'Tichuca Rooftop Bar 屋頂酒吧', mapUrl: MAP_SEARCH + 'Tichuca+Rooftop+Bar+Bangkok', transport: 'BTS Thong Lo 站 3 號出口步行約 8 分鐘，T-One Building 46 樓' }
       ]
     },
     {
       name: 'Day 3｜11/29',
       items: [
-        {
-          place: 'Sanam Luang 10K 馬拉松（06:00–08:30）',
-          mapUrl: MAP_SEARCH + 'Sanam+Luang+Bangkok',
-          transport: '04:30–05:30 出發建議 Grab 直達；或 MRT Sanam Chai 站 1 號出口步行約 10 分鐘'
-        },
-        {
-          place: 'Makkha Health & Spa 按摩恢復（下午）',
-          mapUrl: MAP_SEARCH + 'Makkha+Health+and+Spa+Bangkok',
-          transport: 'BTS Asok 站 4 號出口步行約 5 分鐘｜推薦 Thai Massage、Aroma Oil、Head Spa'
-        },
-        {
-          place: 'Copper Beyond Buffet（Gaysorn Amarin）晚餐',
-          mapUrl: MAP_SEARCH + 'Copper+Beyond+Buffet+Gaysorn+Amarin+Bangkok',
-          transport: 'BTS Chit Lom 站 1 號出口，經 Skywalk 直達 Gaysorn Amarin 4 樓｜需提前預約'
-        }
+        { place: 'Sanam Luang 10K 馬拉松（06:00–08:30）', mapUrl: MAP_SEARCH + 'Sanam+Luang+Bangkok', transport: '04:30–05:30 出發建議 Grab 直達；或 MRT Sanam Chai 站 1 號出口步行約 10 分鐘' },
+        { place: 'Makkha Health & Spa 按摩恢復（下午）', mapUrl: MAP_SEARCH + 'Makkha+Health+and+Spa+Bangkok', transport: 'BTS Asok 站 4 號出口步行約 5 分鐘｜推薦 Thai Massage、Aroma Oil、Head Spa' },
+        { place: 'Copper Beyond Buffet（Gaysorn Amarin）晚餐', mapUrl: MAP_SEARCH + 'Copper+Beyond+Buffet+Gaysorn+Amarin+Bangkok', transport: 'BTS Chit Lom 站 1 號出口，經 Skywalk 直達 Gaysorn Amarin 4 樓｜需提前預約' }
       ]
     },
     {
       name: 'Day 4｜11/30',
       items: [
-        {
-          place: 'SANGARUN.THAI COSTUME 泰服體驗（09:00–13:00）',
-          mapUrl: MAP_SEARCH + 'Sangarun+Thai+Costume+Bangkok',
-          transport: 'BTS Saphan Taksin 站 2 號出口 → 搭船至 Tha Tien 碼頭，步行約 5 分鐘（Wat Arun 附近）'
-        },
-        {
-          place: '鄭王廟 Wat Arun 探索拍照（下午）',
-          mapUrl: MAP_SEARCH + 'Wat+Arun+Bangkok',
-          transport: 'Tha Tien 碼頭搭渡船至 Wat Arun 碼頭，船程約 5 分鐘'
-        }
+        { place: 'SANGARUN.THAI COSTUME 泰服體驗（09:00–13:00）', mapUrl: MAP_SEARCH + 'Sangarun+Thai+Costume+Bangkok', transport: 'BTS Saphan Taksin 站 2 號出口 → 搭船至 Tha Tien 碼頭，步行約 5 分鐘（Wat Arun 附近）' },
+        { place: '鄭王廟 Wat Arun 探索拍照（下午）', mapUrl: MAP_SEARCH + 'Wat+Arun+Bangkok', transport: 'Tha Tien 碼頭搭渡船至 Wat Arun 碼頭，船程約 5 分鐘' }
       ]
     },
     {
       name: 'Day 5｜12/01',
       items: [
-        {
-          place: '素萬那普機場（回程 13:45 EK384）',
-          mapUrl: MAP_SEARCH + 'Suvarnabhumi+Airport+Bangkok',
-          transport: '約 11:00 退房出發，BTS On Nut → Phaya Thai 轉 Airport Rail Link；或 Grab 約 40 分鐘'
-        }
+        { place: '素萬那普機場（回程 13:45 EK384）', mapUrl: MAP_SEARCH + 'Suvarnabhumi+Airport+Bangkok', transport: '約 11:00 退房出發，BTS On Nut → Phaya Thai 轉 Airport Rail Link；或 Grab 約 40 分鐘' }
       ]
     }
   ];
 
-  // ---------- 資料儲存與狀態 ----------
+  // ---------- 資料 ----------
   const STORAGE_KEY = 'pinkTravelAppData_v2';
   const LEGACY_KEY = 'pinkTravelAppData';
 
@@ -700,18 +643,78 @@
     currentDay: '',
     expenses: [],
     settlementHistory: [],
+    files: [],
     rate: 20.5,
     activeTab: 'itinerary'
   };
 
   let rateSaveTimer = null;
+  const fileUrlCache = new Map(); // id -> objectURL
 
-  // 深拷貝
-  function clone(obj) {
-    return JSON.parse(JSON.stringify(obj));
+  function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
+
+  // ---------- IndexedDB 檔案儲存 ----------
+  const DB_NAME = 'travelAppFilesDB';
+  const DB_STORE = 'files';
+
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      if (!window.indexedDB) return reject(new Error('瀏覽器不支援 IndexedDB'));
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = e => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+      };
+      req.onsuccess = e => resolve(e.target.result);
+      req.onerror = e => reject(e.target.error);
+    });
   }
 
-  // 載入資料
+  async function saveFileToDB(id, blob) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).put(blob, id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = e => reject(e.target.error);
+    });
+  }
+
+  async function getFileFromDB(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readonly');
+      const req = tx.objectStore(DB_STORE).get(id);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = e => reject(e.target.error);
+    });
+  }
+
+  async function deleteFileFromDB(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(DB_STORE, 'readwrite');
+      tx.objectStore(DB_STORE).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = e => reject(e.target.error);
+    });
+  }
+
+  async function getFileObjectURL(meta) {
+    if (fileUrlCache.has(meta.id)) return fileUrlCache.get(meta.id);
+    try {
+      const blob = await getFileFromDB(meta.id);
+      if (!blob) return null;
+      const url = URL.createObjectURL(blob);
+      fileUrlCache.set(meta.id, url);
+      return url;
+    } catch (e) {
+      console.warn('讀取檔案失敗', e);
+      return null;
+    }
+  }
+
+  // ---------- 載入 / 儲存 ----------
   function loadData() {
     const stored = localStorage.getItem(STORAGE_KEY);
 
@@ -719,15 +722,14 @@
       try {
         const parsed = JSON.parse(stored);
         appData = { ...appData, ...parsed };
-      } catch (e) {
-        console.warn('載入失敗', e);
-      }
+      } catch (e) { console.warn('載入失敗', e); }
+
       if (!Array.isArray(appData.days)) appData.days = [];
       if (!Array.isArray(appData.expenses)) appData.expenses = [];
       if (!Array.isArray(appData.settlementHistory)) appData.settlementHistory = [];
+      if (!Array.isArray(appData.files)) appData.files = [];
       if (!appData.rate || isNaN(appData.rate)) appData.rate = 20.5;
 
-      // 如果行程為空，補上曼谷行程
       if (appData.days.length === 0) {
         appData.days = clone(BANGKOK_DAYS);
         appData.currentDay = appData.days[0].name;
@@ -737,7 +739,6 @@
       }
       renderAll();
     } else {
-      // 首次使用：檢查是否有舊版資料，保留記帳與匯率
       let legacy = null;
       try {
         const raw = localStorage.getItem(LEGACY_KEY);
@@ -748,15 +749,14 @@
       appData.currentDay = appData.days[0].name;
       appData.activeTab = 'itinerary';
       appData.rate = (legacy && legacy.rate) ? legacy.rate : 20.5;
+      appData.files = [];
       appData.expenses = (legacy && Array.isArray(legacy.expenses) && legacy.expenses.length)
         ? legacy.expenses
         : [
             { id: Date.now() + 1, name: '午餐壽司', total: 5000, currency: 'THB', payMethod: '現金', participants: 2, payer: 'A', splitType: 'custom', customSplit: [{ name: 'A', amount: 2500 }, { name: 'B', amount: 2500 }], settled: false, settledAt: '' },
             { id: Date.now() + 2, name: '晚餐燒肉', total: 6000, currency: 'THB', payMethod: '信用卡', participants: 2, payer: 'B', splitType: 'custom', customSplit: [{ name: 'A', amount: 3000 }, { name: 'B', amount: 3000 }], settled: false, settledAt: '' }
           ];
-      appData.settlementHistory = (legacy && Array.isArray(legacy.settlementHistory))
-        ? legacy.settlementHistory
-        : [];
+      appData.settlementHistory = (legacy && Array.isArray(legacy.settlementHistory)) ? legacy.settlementHistory : [];
 
       saveData();
     }
@@ -765,9 +765,8 @@
   function saveData() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-    } catch (e) {
-      console.warn('儲存失敗', e);
-    }
+    } catch (e) { console.warn('儲存失敗', e); }
+
     const statusEl = document.getElementById('saveStatus');
     const syncEl = document.getElementById('syncIndicator');
     if (statusEl) statusEl.innerText = '已儲存 ✓';
@@ -778,7 +777,7 @@
     renderAll();
   }
 
-  // ---------- 渲染行程 ----------
+  // ---------- 行程 ----------
   function renderDayTabs() {
     const container = document.getElementById('dayTabsContainer');
     if (!container) return;
@@ -791,13 +790,9 @@
       const btn = document.createElement('button');
       btn.className = `day-tab ${appData.currentDay === day.name ? 'active' : ''}`;
       btn.textContent = day.name;
-      btn.onclick = () => {
-        appData.currentDay = day.name;
-        saveData();
-      };
+      btn.onclick = () => { appData.currentDay = day.name; saveData(); };
       container.appendChild(btn);
     });
-
     const label = document.getElementById('currentDayLabel');
     if (label) label.textContent = '加入至：' + (appData.currentDay || '—');
   }
@@ -826,7 +821,6 @@
       mapContainer.innerHTML = '<p style="font-size:13px;color:#b08a95;text-align:center;">✨ 尚無地點</p>';
       return;
     }
-
     current.items.forEach(item => {
       const div = document.createElement('div');
       div.className = 'itinerary-item';
@@ -840,7 +834,7 @@
     });
   }
 
-  // ---------- 渲染記帳 ----------
+  // ---------- 記帳 ----------
   function renderExpenses() {
     const container = document.getElementById('expenseList');
     if (!container) return;
@@ -849,17 +843,12 @@
       container.innerHTML = '<p style="font-size:13px;color:#b08a95;text-align:center;">尚無記帳項目</p>';
       return;
     }
-
     appData.expenses.forEach(exp => {
       const div = document.createElement('div');
       div.className = `expense-item ${exp.settled ? 'settled' : ''}`;
-
-      let splitDetail = '';
-      if (exp.splitType === 'equal') {
-        splitDetail = `人均 ${(exp.total / exp.participants).toFixed(2)} ${exp.currency}`;
-      } else {
-        splitDetail = (exp.customSplit || []).map(s => `${s.name}: ${s.amount}`).join(', ') + ` ${exp.currency}`;
-      }
+      let splitDetail = exp.splitType === 'equal'
+        ? `人均 ${(exp.total / exp.participants).toFixed(2)} ${exp.currency}`
+        : (exp.customSplit || []).map(s => `${s.name}: ${s.amount}`).join(', ') + ` ${exp.currency}`;
 
       div.innerHTML = `
         <div class="expense-header">
@@ -892,7 +881,6 @@
     }
   };
 
-  // 結算
   function settleAll() {
     const unsettled = appData.expenses.filter(e => !e.settled);
     const resultEl = document.getElementById('settlementResult');
@@ -901,21 +889,18 @@
       return;
     }
 
-    // 以人名 + 幣種計算淨額
-    const balances = {}; // name -> { THB: 0, HKD: 0 }
+    const balances = {};
     unsettled.forEach(exp => {
       const cur = exp.currency;
       if (!balances[exp.payer]) balances[exp.payer] = { THB: 0, HKD: 0 };
       balances[exp.payer][cur] += exp.total;
-
       (exp.customSplit || []).forEach(s => {
         if (!balances[s.name]) balances[s.name] = { THB: 0, HKD: 0 };
         balances[s.name][cur] -= s.amount;
       });
     });
 
-    const debtors = [];
-    const creditors = [];
+    const debtors = [], creditors = [];
     Object.entries(balances).forEach(([name, bal]) => {
       ['THB', 'HKD'].forEach(cur => {
         const amt = bal[cur];
@@ -948,11 +933,7 @@
     }
 
     const now = new Date().toLocaleString('zh-HK');
-    unsettled.forEach(exp => {
-      exp.settled = true;
-      exp.settledAt = now;
-    });
-
+    unsettled.forEach(exp => { exp.settled = true; exp.settledAt = now; });
     appData.settlementHistory.push({
       date: now,
       details: detailsText.length ? detailsText.join('；') : '無差額',
@@ -963,14 +944,10 @@
     saveData();
   }
 
-  // 渲染歷史
   function renderHistory() {
     const container = document.getElementById('settlementHistory');
     if (!container) return;
-    if (!appData.settlementHistory.length) {
-      container.innerHTML = '';
-      return;
-    }
+    if (!appData.settlementHistory.length) { container.innerHTML = ''; return; }
     let html = '<h4 style="font-size:14px; margin-bottom:8px;">📜 結清記錄</h4>';
     appData.settlementHistory.forEach(h => {
       const content = h.html || (h.details || '');
@@ -992,32 +969,21 @@
   function initRateInputs() {
     const rateInput = document.getElementById('rateSetting');
     if (rateInput) rateInput.value = appData.rate;
-
     const jpyInput = document.getElementById('jpyInput');
     const hkdInput = document.getElementById('hkdInput');
 
     if (jpyInput) {
       jpyInput.addEventListener('input', function() {
         const jpy = parseFloat(this.value);
-        if (!isNaN(jpy)) {
-          hkdInput.value = (jpy / appData.rate).toFixed(2);
-        } else {
-          hkdInput.value = '';
-        }
+        hkdInput.value = !isNaN(jpy) ? (jpy / appData.rate).toFixed(2) : '';
       });
     }
-
     if (hkdInput) {
       hkdInput.addEventListener('input', function() {
         const hkd = parseFloat(this.value);
-        if (!isNaN(hkd)) {
-          jpyInput.value = (hkd * appData.rate).toFixed(2);
-        } else {
-          jpyInput.value = '';
-        }
+        jpyInput.value = !isNaN(hkd) ? (hkd * appData.rate).toFixed(2) : '';
       });
     }
-
     if (rateInput) {
       rateInput.addEventListener('input', function() {
         const v = parseFloat(this.value);
@@ -1031,7 +997,7 @@
     }
   }
 
-  // ---------- 分頁切換 ----------
+  // ---------- 分頁 ----------
   function switchTab(tabId) {
     appData.activeTab = tabId;
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
@@ -1043,7 +1009,7 @@
     saveData();
   }
 
-  // ---------- 新增行程 ----------
+  // ---------- 新增行程 / 支出 ----------
   function addItinerary() {
     const placeEl = document.getElementById('placeName');
     const mapEl = document.getElementById('placeMapUrl');
@@ -1060,13 +1026,10 @@
       appData.currentDay = day.name;
     }
     day.items.push({ place, mapUrl, transport });
-    placeEl.value = '';
-    mapEl.value = '';
-    transportEl.value = '';
+    placeEl.value = ''; mapEl.value = ''; transportEl.value = '';
     saveData();
   }
 
-  // ---------- 新增支出 ----------
   function addExpense() {
     const name = document.getElementById('expenseName').value.trim();
     const total = parseFloat(document.getElementById('expenseTotal').value);
@@ -1081,12 +1044,10 @@
     }
 
     let customSplit = [];
-
     if (splitType === 'custom') {
       const raw = document.getElementById('customSplitInput').value.trim();
       if (!raw) return alert('請輸入分開付的人名與金額');
-      const lines = raw.split('\n');
-      for (const line of lines) {
+      for (const line of raw.split('\n')) {
         if (!line.trim()) continue;
         const parts = line.split(',');
         if (parts.length < 2) return alert('格式錯誤，請使用「人名,金額」');
@@ -1107,17 +1068,9 @@
     }
 
     appData.expenses.push({
-      id: Date.now(),
-      name,
-      total,
-      currency,
-      payMethod,
-      participants,
-      payer,
-      splitType,
-      customSplit,
-      settled: false,
-      settledAt: ''
+      id: Date.now(), name, total, currency, payMethod,
+      participants, payer, splitType, customSplit,
+      settled: false, settledAt: ''
     });
 
     document.getElementById('expenseName').value = '';
@@ -1126,13 +1079,114 @@
     saveData();
   }
 
-  // ---------- 初始化渲染 ----------
+  // ---------- 文件 ----------
+  function formatSize(bytes) {
+    if (!bytes || bytes <= 0) return '0 B';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+  }
+
+  function renderFiles() {
+    const container = document.getElementById('fileList');
+    if (!container) return;
+    container.innerHTML = '';
+    if (!appData.files.length) {
+      container.innerHTML = '<p style="font-size:13px;color:#b08a95;text-align:center;">尚未上載文件</p>';
+      return;
+    }
+
+    appData.files.slice().reverse().forEach(f => {
+      const isImage = (f.type || '').startsWith('image/');
+      const isPDF = (f.type === 'application/pdf') || (f.name || '').toLowerCase().endsWith('.pdf');
+      const icon = isImage ? '🖼️' : (isPDF ? '📄' : '📎');
+
+      const div = document.createElement('div');
+      div.className = 'file-item';
+      div.innerHTML = `
+        <div class="file-thumb" id="thumb_${f.id}">${icon}</div>
+        <div class="file-info">
+          <div class="file-name" title="${f.name}">${f.name}</div>
+          <div class="file-meta">${formatSize(f.size)}・${f.uploadedAt}</div>
+        </div>
+        <div class="file-actions">
+          <button class="small secondary" onclick="previewFile('${f.id}')">查看</button>
+          <button class="small secondary" onclick="deleteFile('${f.id}')">刪除</button>
+        </div>
+      `;
+      container.appendChild(div);
+
+      if (isImage) {
+        getFileObjectURL(f).then(url => {
+          if (!url) return;
+          const thumb = document.getElementById('thumb_' + f.id);
+          if (thumb) {
+            thumb.innerHTML = '';
+            const img = document.createElement('img');
+            img.src = url;
+            img.className = 'file-thumb-img';
+            img.alt = f.name;
+            thumb.appendChild(img);
+          }
+        });
+      }
+    });
+  }
+
+  window.previewFile = async function(id) {
+    const meta = appData.files.find(f => f.id === id);
+    if (!meta) return;
+    const url = await getFileObjectURL(meta);
+    if (!url) return alert('讀取檔案失敗，可能已被瀏覽器清除');
+    window.open(url, '_blank');
+  };
+
+  window.deleteFile = async function(id) {
+    if (!confirm('確定刪除此文件？')) return;
+    if (fileUrlCache.has(id)) {
+      URL.revokeObjectURL(fileUrlCache.get(id));
+      fileUrlCache.delete(id);
+    }
+    try { await deleteFileFromDB(id); } catch (e) { console.warn(e); }
+    appData.files = appData.files.filter(f => f.id !== id);
+    saveData();
+  };
+
+  async function handleFileUpload(files) {
+    if (!files || !files.length) return;
+    let success = 0;
+    for (const file of files) {
+      if (file.size > 20 * 1024 * 1024) {
+        alert(`檔案「${file.name}」超過 20MB，已跳過`);
+        continue;
+      }
+      const id = 'file_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+      try {
+        await saveFileToDB(id, file);
+        appData.files.push({
+          id,
+          name: file.name,
+          type: file.type || '',
+          size: file.size,
+          uploadedAt: new Date().toLocaleString('zh-HK')
+        });
+        success++;
+      } catch (e) {
+        console.error(e);
+        alert('儲存檔案失敗：' + file.name + '\n（可能瀏覽器不支援或空間不足）');
+      }
+    }
+    if (success > 0) saveData();
+  }
+
+  // ---------- 渲染全部 ----------
   function renderAll() {
     renderDayTabs();
     renderItineraryList();
     renderExpenses();
     updateRateDisplay();
     renderHistory();
+    renderFiles();
 
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
     const activeTab = appData.activeTab || 'itinerary';
@@ -1143,7 +1197,7 @@
     });
   }
 
-  // ---------- 事件綁定 ----------
+  // ---------- 事件 ----------
   document.querySelectorAll('.nav-item').forEach(btn => {
     btn.addEventListener('click', () => switchTab(btn.dataset.tab));
   });
@@ -1170,6 +1224,25 @@
   });
 
   document.getElementById('settleAllBtn').addEventListener('click', settleAll);
+
+  // 文件上載
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  if (uploadZone && fileInput) {
+    uploadZone.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', async function() {
+      await handleFileUpload(Array.from(this.files || []));
+      this.value = '';
+    });
+    // 拖放支援
+    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.background = '#f5ece2'; });
+    uploadZone.addEventListener('dragleave', () => { uploadZone.style.background = ''; });
+    uploadZone.addEventListener('drop', async e => {
+      e.preventDefault();
+      uploadZone.style.background = '';
+      await handleFileUpload(Array.from(e.dataTransfer.files || []));
+    });
+  }
 
   // ---------- 啟動 ----------
   window.addEventListener('load', function() {
