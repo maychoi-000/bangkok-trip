@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>曼谷旅の手帳</title>
+  <title>旅の手帳 - 曼谷2026.11</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
@@ -46,7 +46,6 @@
     .expense-amount { font-weight:600; color:#e06b8e; }
     .expense-detail { font-size:11px; color:#937a83; margin-bottom:4px; }
     .expense-actions { display:flex; gap:6px; justify-content:flex-end; margin-top:6px; }
-    .settle-card { background:#faf3ec; border-radius:18px; padding:12px; margin-top:10px; font-size:13px; border:1px dashed #ffb6c9; }
     .hidden { display:none !important; }
     .bottom-nav { display:flex; justify-content:space-around; padding:8px 0 12px; background:#fdfaf5; border-top:2px solid #f0e4d8; border-radius:0 0 42px 42px; }
     .nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:9px; color:#b89a8a; background:none; border:none; padding:4px 4px; border-radius:20px; box-shadow:none; flex:1; }
@@ -73,27 +72,34 @@
     .progress-text { font-size:12px; color:#e06b8e; text-align:center; margin-top:8px; min-height:18px; }
     .sync-status { font-size:12px; color:#e06b8e; text-align:center; min-height:18px; padding:4px; }
 
-    /* 同行者標籤 */
-    .traveler-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
-    .traveler-chip {
-      display:inline-flex; align-items:center; gap:6px;
-      background:#ffe2eb; color:#b85c7a;
-      padding:6px 8px 6px 12px; border-radius:20px;
-      font-size:13px; font-weight:600;
-      border:1px solid #ffd0df;
+    /* 同行者列表 */
+    .traveler-row {
+      display:flex;
+      align-items:center;
+      gap:10px;
+      background:#faf7f1;
+      border-radius:16px;
+      padding:10px 12px;
+      margin-bottom:8px;
+      border:1px solid #f0e4d8;
     }
-    .traveler-chip .minus {
+    .traveler-main { flex:1; min-width:0; }
+    .traveler-name { font-weight:600; color:#a0526e; font-size:13px; }
+    .traveler-stats { font-size:10px; color:#b08a95; margin-top:3px; line-height:1.6; }
+    .traveler-stats .stat-line { display:block; }
+    .traveler-stats b { color:#b85c7a; font-weight:600; }
+    .traveler-row .minus {
       background:#ffb6c9; color:#fff; border:none;
-      width:20px; height:20px; border-radius:50%;
+      width:24px; height:24px; border-radius:50%;
+      font-size:15px; font-weight:700; cursor:pointer;
       display:inline-flex; align-items:center; justify-content:center;
-      font-size:14px; line-height:1; padding:0; cursor:pointer;
-      box-shadow:none; font-weight:700;
+      box-shadow:none; flex-shrink:0; padding:0; line-height:1;
     }
-    .traveler-chip .minus:active { background:#f79eb6; transform:scale(.92); }
-    .traveler-add-row { display:flex; gap:8px; }
+    .traveler-row .minus:active { background:#f79eb6; transform:scale(.92); }
+    .traveler-add-row { display:flex; gap:8px; margin-top:10px; }
     .traveler-add-row input { flex:1; }
     .traveler-add-row button { flex:0 0 auto; padding:10px 16px; }
-    .empty-travelers { font-size:12px; color:#b08a95; margin-bottom:10px; }
+    .empty-travelers { font-size:12px; color:#b08a95; padding:8px 0; }
   </style>
 </head>
 <body>
@@ -103,7 +109,7 @@
     <span id="saveStatus">已儲存</span>
   </div>
   <div class="app-header">
-    <h1><span>🧸</span> 曼谷旅帳</h1>
+    <h1><span>🧸</span> 旅の手帳</h1>
     <div class="save-indicator" id="syncIndicator">🔄 自動儲存</div>
   </div>
 
@@ -140,17 +146,6 @@
 
     <!-- 記帳 -->
     <div id="tab-expense" class="tab-pane hidden">
-      <!-- 同行者管理 -->
-      <div class="card">
-        <div class="card-title"><i>👥</i> 同行者管理 <span style="font-size:11px;color:#b08a95;font-weight:400;margin-left:auto;" id="travelerCount">0 / 5</span></div>
-        <div class="traveler-chips" id="travelerChips"></div>
-        <div class="traveler-add-row">
-          <input type="text" id="newTravelerName" placeholder="輸入名字" maxlength="12">
-          <button id="addTravelerBtn" class="small">➕ 新增</button>
-        </div>
-        <p class="hint" style="text-align:left;margin-top:8px;">最多 5 位同行者</p>
-      </div>
-
       <!-- 新增支出 -->
       <div class="card">
         <div class="card-title"><i>💰</i> 新增支出</div>
@@ -168,22 +163,24 @@
           <label>誰負責付款</label>
           <select id="expensePayer"></select>
         </div>
-        <div class="form-row"><label>分攤方式</label>
-          <select id="splitType"><option value="equal">人均 (總額 ÷ 同行者人數)</option><option value="custom">分開付 (手動輸入每人金額)</option></select>
-        </div>
-        <div id="customSplitContainer" class="hidden">
-          <label>參與人名與金額 (每行一組: 人名,金額)</label>
-          <textarea id="customSplitInput" rows="2" placeholder="A,2500&#10;B,2500"></textarea>
-        </div>
         <button id="addExpenseBtn" style="width:100%;margin-top:8px;">📝 新增支出</button>
       </div>
 
-      <!-- 支出列表 + 即時結算 -->
+      <!-- 支出列表 -->
       <div class="card">
         <div class="card-title"><i>🧾</i> 支出列表</div>
         <div id="expenseList"></div>
-        <div class="card-title" style="margin-top:16px;margin-bottom:8px;font-size:14px;border-bottom:2px dotted #f0d9cc;padding-bottom:6px;"><i>💡</i> 即時結算</div>
-        <div id="settlementResult" class="settle-card"></div>
+      </div>
+
+      <!-- 同行者管理（最底） -->
+      <div class="card">
+        <div class="card-title"><i>👥</i> 同行者管理 <span style="font-size:11px;color:#b08a95;font-weight:400;margin-left:auto;" id="travelerCount">0 / 5</span></div>
+        <div id="travelerList"></div>
+        <div class="traveler-add-row">
+          <input type="text" id="newTravelerName" placeholder="輸入名字" maxlength="12">
+          <button id="addTravelerBtn" class="small">➕ 新增</button>
+        </div>
+        <p class="hint" style="text-align:left;margin-top:8px;">最多 5 位同行者，所有支出自動按人數平均分攤</p>
       </div>
     </div>
 
@@ -439,7 +436,6 @@
       if(!appData.currentDay||!appData.days.some(d=>d.name===appData.currentDay)){appData.currentDay=appData.days[0].name;}
       const valid=['itinerary','map','expense','files','backup'];
       if(!valid.includes(appData.activeTab))appData.activeTab='itinerary';
-      // 舊資料清理：移除 settled / settlementHistory 依賴
       if(appData.settlementHistory)delete appData.settlementHistory;
       renderAll();
     }else{
@@ -451,10 +447,10 @@
       appData.files=[];
       appData.travelers=['A','B'];
       appData.expenses=(legacy&&Array.isArray(legacy.expenses)&&legacy.expenses.length)
-        ? legacy.expenses.map(e=>({id:e.id||Date.now()+Math.random(),name:e.name,total:e.total,currency:e.currency,payMethod:e.payMethod||'現金',payer:e.payer,splitType:e.splitType,customSplit:e.customSplit||[]}))
+        ? legacy.expenses.map(e=>({id:e.id||Date.now()+Math.random(),name:e.name,total:e.total,currency:e.currency,payMethod:e.payMethod||'現金',payer:e.payer,customSplit:e.customSplit||[]}))
         : [
-            { id: Date.now()+1, name:'午餐壽司', total:5000, currency:'THB', payMethod:'現金', payer:'A', splitType:'custom', customSplit:[{name:'A',amount:2500},{name:'B',amount:2500}] },
-            { id: Date.now()+2, name:'晚餐燒肉', total:6000, currency:'THB', payMethod:'信用卡', payer:'B', splitType:'custom', customSplit:[{name:'A',amount:3000},{name:'B',amount:3000}] }
+            { id: Date.now()+1, name:'午餐壽司', total:5000, currency:'THB', payMethod:'現金', payer:'A', customSplit:[{name:'A',amount:2500},{name:'B',amount:2500}] },
+            { id: Date.now()+2, name:'晚餐燒肉', total:6000, currency:'THB', payMethod:'信用卡', payer:'B', customSplit:[{name:'A',amount:3000},{name:'B',amount:3000}] }
           ];
       saveData();
     }
@@ -509,24 +505,51 @@
     });
   }
 
-  // ---------- 同行者 ----------
+  // ---------- 同行者（顯示每人總數） ----------
+  function calcTravelerTotals(name){
+    const paid={THB:0,HKD:0};
+    const owed={THB:0,HKD:0};
+    appData.expenses.forEach(exp=>{
+      const cur=exp.currency||'THB';
+      if(exp.payer===name) paid[cur]=(paid[cur]||0)+ (Number(exp.total)||0);
+      (exp.customSplit||[]).forEach(s=>{
+        if(s.name===name) owed[cur]=(owed[cur]||0)+ (Number(s.amount)||0);
+      });
+    });
+    return {paid,owed};
+  }
+
+  function fmtMoney(v){
+    const n=Number(v)||0;
+    return (Math.round(n*100)/100).toFixed(2);
+  }
+
   function renderTravelers(){
-    const chips=document.getElementById('travelerChips');
+    const list=document.getElementById('travelerList');
     const countEl=document.getElementById('travelerCount');
-    if(!chips)return;
-    chips.innerHTML='';
+    if(!list)return;
+    list.innerHTML='';
     if(!appData.travelers.length){
-      chips.innerHTML='<div class="empty-travelers">尚未新增同行者，請用下方 ➕ 新增</div>';
+      list.innerHTML='<div class="empty-travelers">尚未新增同行者，請用下方 ➕ 新增</div>';
     }else{
       appData.travelers.forEach((name,idx)=>{
-        const chip=document.createElement('div');
-        chip.className='traveler-chip';
-        chip.innerHTML=`<span>${escapeHtml(name)}</span><button class="minus" data-idx="${idx}" title="移除">−</button>`;
-        chips.appendChild(chip);
+        const {paid,owed}=calcTravelerTotals(name);
+        const row=document.createElement('div');
+        row.className='traveler-row';
+        row.innerHTML=`
+          <div class="traveler-main">
+            <div class="traveler-name">${escapeHtml(name)}</div>
+            <div class="traveler-stats">
+              <span class="stat-line">已付：<b>THB ${fmtMoney(paid.THB)}</b> · <b>HKD ${fmtMoney(paid.HKD)}</b></span>
+              <span class="stat-line">應付：<b>THB ${fmtMoney(owed.THB)}</b> · <b>HKD ${fmtMoney(owed.HKD)}</b></span>
+            </div>
+          </div>
+          <button class="minus" data-idx="${idx}" title="移除">−</button>
+        `;
+        list.appendChild(row);
       });
     }
     if(countEl)countEl.textContent=`${appData.travelers.length} / ${MAX_TRAVELERS}`;
-    // 同步付款人下拉
     renderPayerSelect();
   }
 
@@ -576,28 +599,26 @@
 
   function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
-  // ---------- 記帳 ----------
+  // ---------- 記帳（已移除即時結算） ----------
   function renderExpenses(){
     const c=document.getElementById('expenseList');
     if(!c)return;
     c.innerHTML='';
     if(!appData.expenses.length){
       c.innerHTML='<p style="font-size:13px;color:#b08a95;text-align:center;">尚無記帳項目</p>';
-    }else{
-      appData.expenses.forEach(exp=>{
-        const d=document.createElement('div');
-        d.className='expense-item';
-        const sd=exp.splitType==='equal'
-          ? `人均 ${(exp.total/(exp.customSplit&&exp.customSplit.length?exp.customSplit.length:1)).toFixed(2)} ${exp.currency}`
-          : (exp.customSplit||[]).map(s=>`${s.name}: ${s.amount}`).join(', ')+` ${exp.currency}`;
-        d.innerHTML=`
-          <div class="expense-header"><span class="expense-name">${escapeHtml(exp.name)}</span><span class="expense-amount">${exp.total} ${exp.currency}</span></div>
-          <div class="expense-detail">付款人：${escapeHtml(exp.payer)}｜${sd}｜${escapeHtml(exp.payMethod||'')}</div>
-          <div class="expense-actions"><button class="small secondary" onclick="deleteExpense(${JSON.stringify(exp.id)})">刪除</button></div>`;
-        c.appendChild(d);
-      });
+      return;
     }
-    renderSettlement();
+    appData.expenses.forEach(exp=>{
+      const d=document.createElement('div');
+      d.className='expense-item';
+      const per=(exp.total/((exp.customSplit&&exp.customSplit.length)||1)).toFixed(2);
+      const sd=`人均 ${per} ${exp.currency}`;
+      d.innerHTML=`
+        <div class="expense-header"><span class="expense-name">${escapeHtml(exp.name)}</span><span class="expense-amount">${exp.total} ${exp.currency}</span></div>
+        <div class="expense-detail">付款人：${escapeHtml(exp.payer)}｜${sd}｜${escapeHtml(exp.payMethod||'')}</div>
+        <div class="expense-actions"><button class="small secondary" onclick="deleteExpense('${exp.id}')">刪除</button></div>`;
+      c.appendChild(d);
+    });
   }
 
   window.deleteExpense=function(id){
@@ -608,97 +629,26 @@
     saveData();
   };
 
-  function renderSettlement(){
-    const el=document.getElementById('settlementResult');
-    if(!el)return;
-    if(!appData.expenses.length){
-      el.innerHTML='<p style="color:#b08a95;text-align:center;">尚未有支出，暫無結算</p>';
-      return;
-    }
-
-    const balances={}; // name -> {THB, HKD}
-    const ensure=n=>{if(!balances[n])balances[n]={THB:0,HKD:0};};
-
-    appData.expenses.forEach(exp=>{
-      const cur=exp.currency||'THB';
-      if(!exp.customSplit||!exp.customSplit.length)return;
-      ensure(exp.payer);
-      balances[exp.payer][cur]+=exp.total;
-      exp.customSplit.forEach(s=>{
-        ensure(s.name);
-        balances[s.name][cur]-=s.amount;
-      });
-    });
-
-    const debtors=[],creditors=[];
-    Object.entries(balances).forEach(([n,b])=>{
-      ['THB','HKD'].forEach(cur=>{
-        const a=Math.round(b[cur]*100)/100;
-        if(a>0.01)creditors.push({name:n,cur,amount:a});
-        else if(a<-0.01)debtors.push({name:n,cur,amount:-a});
-      });
-    });
-
-    let html='';
-    if(!debtors.length&&!creditors.length){
-      html='<p style="text-align:center;">✨ 所有帳目已平衡</p>';
-    }else{
-      // 以金額大小排序，穩定輸出
-      debtors.sort((a,b)=>b.amount-a.amount);
-      creditors.sort((a,b)=>b.amount-a.amount);
-      debtors.forEach(d=>{
-        creditors.forEach(c=>{
-          if(d.cur===c.cur&&d.amount>0.01&&c.amount>0.01){
-            const pay=Math.min(d.amount,c.amount);
-            if(pay>0.01){
-              html+=`<p style="margin:4px 0;">💸 <b>${escapeHtml(d.name)}</b> 應該付 <b>${escapeHtml(c.name)}</b> ${pay.toFixed(2)} ${d.cur}</p>`;
-              d.amount-=pay;
-              c.amount-=pay;
-            }
-          }
-        });
-      });
-      if(!html)html='<p style="text-align:center;">✨ 所有帳目已平衡</p>';
-    }
-    el.innerHTML=html;
-  }
-
   function addExpense(){
     const name=document.getElementById('expenseName').value.trim();
     const total=parseFloat(document.getElementById('expenseTotal').value);
     const currency=document.getElementById('expenseCurrency').value;
     const payMethod=document.getElementById('expensePayMethod').value;
     const payer=document.getElementById('expensePayer').value;
-    const splitType=document.getElementById('splitType').value;
 
     if(!appData.travelers.length){alert('請先新增同行者');return;}
     if(!name||isNaN(total)||total<=0||!payer){alert('請填寫項目名稱、正確金額和付款人');return;}
 
-    let customSplit=[];
-    if(splitType==='custom'){
-      const raw=document.getElementById('customSplitInput').value.trim();
-      if(!raw){alert('請輸入分開付的人名與金額');return;}
-      for(const line of raw.split('\n')){
-        if(!line.trim())continue;
-        const parts=line.split(',');
-        if(parts.length<2){alert('格式錯誤，請使用「人名,金額」');return;}
-        const p=parts[0].trim(),a=parseFloat(parts[1].trim());
-        if(!p||isNaN(a)){alert('格式錯誤，請使用「人名,金額」');return;}
-        customSplit.push({name:p,amount:a});
-      }
-    }else{
-      // 人均：用全部同行者
-      const per=total/appData.travelers.length;
-      customSplit=appData.travelers.map(n=>({name:n,amount:Math.round(per*100)/100}));
-    }
+    // 自動按同行者人數平均分攤
+    const per=total/appData.travelers.length;
+    const customSplit=appData.travelers.map(n=>({name:n,amount:Math.round(per*100)/100}));
 
     appData.expenses.push({
       id:Date.now()+'_'+Math.random().toString(36).slice(2,6),
-      name,total,currency,payMethod,payer,splitType,customSplit
+      name,total,currency,payMethod,payer,customSplit
     });
     document.getElementById('expenseName').value='';
     document.getElementById('expenseTotal').value='';
-    document.getElementById('customSplitInput').value='';
     saveData();
   }
 
@@ -929,10 +879,8 @@
     initSyncUI();
     renderAll();
 
-    // 導航
     document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
 
-    // 行程
     document.getElementById('addItineraryBtn').addEventListener('click',addItinerary);
     document.getElementById('addDayBtn').addEventListener('click',function(){
       const el=document.getElementById('newDayName');
@@ -942,25 +890,17 @@
       appData.days.push({name,items:[]});appData.currentDay=name;el.value='';saveData();
     });
 
-    // 同行者
     document.getElementById('addTravelerBtn').addEventListener('click',addTraveler);
     document.getElementById('newTravelerName').addEventListener('keydown',e=>{
       if(e.key==='Enter'){e.preventDefault();addTraveler();}
     });
-    // chips 用事件委派處理減號
-    document.getElementById('travelerChips').addEventListener('click',e=>{
+    document.getElementById('travelerList').addEventListener('click',e=>{
       const btn=e.target.closest('.minus');
       if(btn){removeTraveler(parseInt(btn.dataset.idx,10));}
     });
 
-    // 支出
     document.getElementById('addExpenseBtn').addEventListener('click',addExpense);
-    document.getElementById('splitType').addEventListener('change',function(){
-      const d=document.getElementById('customSplitContainer');
-      if(this.value==='custom')d.classList.remove('hidden');else d.classList.add('hidden');
-    });
 
-    // 文件
     const uz=document.getElementById('uploadZone'),fi=document.getElementById('fileInput');
     if(uz&&fi){
       uz.addEventListener('click',()=>fi.click());
@@ -970,7 +910,6 @@
       uz.addEventListener('drop',async e=>{e.preventDefault();uz.style.background='';await handleFileUpload(Array.from(e.dataTransfer.files||[]));});
     }
 
-    // 雲端檢查
     if(supabaseClient){
       setTimeout(()=>pullIfCloudNewer(),1500);
     }
