@@ -3,413 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>曼谷旅の手帳</title>
+  <title>🌸 米白日系・曼谷旅の手帳</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Helvetica Neue', sans-serif;
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI','PingFang TC','Microsoft JhengHei','Helvetica Neue',sans-serif; }
+    body { background:#f2ebe1; display:flex; justify-content:center; align-items:center; min-height:100vh; padding:10px; }
+    .app-container { max-width:400px; width:100%; height:780px; background:#fdfaf5; border-radius:42px; box-shadow:0 20px 40px rgba(200,170,150,.25),0 8px 16px rgba(0,0,0,.05); overflow:hidden; display:flex; flex-direction:column; position:relative; border:2px solid #f0e4d8; }
+    .status-bar { display:flex; justify-content:space-between; padding:12px 20px 6px; font-size:12px; color:#b89a8a; font-weight:500; background:#fdfaf5; }
+    .app-header { padding:8px 20px 12px; display:flex; justify-content:space-between; align-items:center; border-bottom:2px dashed #f0d9cc; background:#fdfaf5; }
+    .app-header h1 { font-size:20px; font-weight:600; color:#c96b8a; letter-spacing:1px; display:flex; align-items:center; gap:6px; }
+    .app-header h1 span { font-size:22px; }
+    .save-indicator { font-size:10px; color:#b0a0a6; background:#f2e6de; padding:4px 10px; border-radius:20px; transition:.3s; }
+    .main-content { flex:1; overflow-y:auto; padding:16px 16px 20px; background:#fdfaf5; scrollbar-width:thin; scrollbar-color:#f0c8b8 #f5ece2; }
+    .main-content::-webkit-scrollbar { width:5px; }
+    .main-content::-webkit-scrollbar-thumb { background:#f0c8b8; border-radius:10px; }
+    .card { background:#fff; border-radius:26px; padding:18px 18px; margin-bottom:18px; box-shadow:0 6px 18px rgba(220,190,170,.18),0 2px 6px rgba(230,200,180,.12); border:1px solid #f0e4d8; }
+    .card-title { display:flex; align-items:center; gap:8px; font-size:16px; font-weight:600; color:#b85c7a; margin-bottom:14px; padding-bottom:6px; border-bottom:2px dotted #f0d9cc; }
+    .card-title i { font-size:20px; }
+    button,.btn { background:#ffb6c9; border:none; border-radius:30px; padding:8px 16px; color:#fff; font-weight:600; font-size:13px; cursor:pointer; transition:.2s; box-shadow:0 4px 8px rgba(255,150,180,.3); display:inline-flex; align-items:center; justify-content:center; gap:4px; letter-spacing:.3px; }
+    button:active { transform:scale(.96); background:#f79eb6; }
+    button:disabled { opacity:.6; cursor:not-allowed; }
+    button.secondary { background:#f5ece2; color:#b85c7a; box-shadow:0 2px 6px rgba(230,200,180,.4); }
+    button.small { padding:5px 10px; font-size:11px; }
+    .day-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .day-tab { background:#faf5ee; border:1.5px solid #f0d9cc; color:#b85c7a; padding:8px 14px; border-radius:30px; font-size:13px; font-weight:500; cursor:pointer; transition:.2s; }
+    .day-tab.active { background:#ffb6c9; border-color:#ffb6c9; color:#fff; box-shadow:0 4px 8px rgba(255,140,170,.4); }
+    .itinerary-list { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+    .itinerary-item { background:#faf7f1; border-radius:18px; padding:12px 14px; border-left:6px solid #ffb6c9; font-size:13px; color:#5e4a52; display:flex; flex-direction:column; gap:4px; box-shadow:0 2px 6px rgba(230,210,190,.3); }
+    .itinerary-item .place { font-weight:600; color:#a0526e; display:flex; justify-content:space-between; align-items:center; gap:8px; line-height:1.35; }
+    .itinerary-item .transport { font-size:11px; color:#b08a95; background:#f5ece2; padding:4px 8px; border-radius:12px; margin-top:4px; display:inline-block; width:fit-content; line-height:1.5; }
+    .map-link { font-size:11px; color:#e06b8e; text-decoration:none; background:#ffe2eb; padding:3px 10px; border-radius:16px; display:inline-flex; align-items:center; gap:4px; font-weight:500; white-space:nowrap; flex-shrink:0; }
+    input,select,textarea { background:#faf6f0; border:1.5px solid #f0ddd2; border-radius:30px; padding:10px 14px; font-size:13px; width:100%; outline:none; color:#4f3a42; transition:.2s; }
+    input:focus,select:focus,textarea:focus { border-color:#ffb6c9; background:#fff; }
+    label { font-size:12px; color:#b85c7a; margin-bottom:4px; display:block; font-weight:500; }
+    .form-row { margin-bottom:12px; }
+    .flex-row { display:flex; gap:8px; align-items:center; }
+    .flex-row > * { flex:1; }
+    .expense-item { background:#faf7f1; border-radius:20px; padding:12px 14px; margin-bottom:10px; border:1px solid #f0e4d8; font-size:13px; }
+    .expense-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+    .expense-name { font-weight:600; color:#b85c7a; }
+    .expense-amount { font-weight:600; color:#e06b8e; }
+    .expense-detail { font-size:11px; color:#937a83; margin-bottom:4px; }
+    .expense-actions { display:flex; gap:6px; justify-content:flex-end; margin-top:6px; }
+    .settle-card { background:#faf3ec; border-radius:18px; padding:12px; margin-top:10px; font-size:13px; border:1px dashed #ffb6c9; }
+    .hidden { display:none !important; }
+    .bottom-nav { display:flex; justify-content:space-around; padding:8px 0 12px; background:#fdfaf5; border-top:2px solid #f0e4d8; border-radius:0 0 42px 42px; }
+    .nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; font-size:9px; color:#b89a8a; background:none; border:none; padding:4px 4px; border-radius:20px; box-shadow:none; flex:1; }
+    .nav-item.active { color:#e06b8e; font-weight:600; background:#f7ede4; }
+    .nav-item i { font-size:19px; line-height:1; }
+    .hint { font-size:10px; color:#b0a0a6; text-align:center; margin-top:4px; }
+    .current-day-label { font-size:11px; color:#b08a95; background:#faf3ec; border-radius:14px; padding:5px 10px; margin-bottom:10px; display:inline-block; }
+    .file-item { display:flex; align-items:center; gap:10px; background:#faf7f1; border-radius:16px; padding:10px 12px; margin-bottom:8px; border:1px solid #f0e4d8; }
+    .file-thumb { width:48px; height:48px; border-radius:12px; background:#f5ece2; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; overflow:hidden; }
+    .file-thumb-img { width:100%; height:100%; object-fit:cover; border-radius:12px; display:block; }
+    .file-info { flex:1; min-width:0; }
+    .file-name { font-size:12px; font-weight:600; color:#a0526e; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .file-meta { font-size:10px; color:#b08a95; margin-top:2px; }
+    .file-actions { display:flex; gap:4px; flex-shrink:0; }
+    .upload-zone { border:2px dashed #f0d9cc; border-radius:20px; padding:18px; text-align:center; background:#faf7f1; cursor:pointer; transition:.2s; }
+    .upload-zone:active { background:#f5ece2; }
+    .upload-zone .up-icon { font-size:32px; }
+    .upload-zone .up-title { font-size:13px; color:#b85c7a; font-weight:600; margin-top:6px; }
+    .upload-zone .up-sub { font-size:11px; color:#b08a95; margin-top:4px; }
+    .backup-box { background:#faf7f1; border-radius:20px; padding:16px; margin-bottom:12px; border:1px dashed #f0d9cc; text-align:center; }
+    .backup-box .b-icon { font-size:30px; }
+    .backup-box .b-title { font-size:14px; font-weight:600; color:#b85c7a; margin:6px 0 4px; }
+    .backup-box .b-desc { font-size:11px; color:#b08a95; line-height:1.6; margin-bottom:10px; }
+    .progress-text { font-size:12px; color:#e06b8e; text-align:center; margin-top:8px; min-height:18px; }
+    .sync-status { font-size:12px; color:#e06b8e; text-align:center; min-height:18px; padding:4px; }
+
+    /* 同行者標籤 */
+    .traveler-chips { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+    .traveler-chip {
+      display:inline-flex; align-items:center; gap:6px;
+      background:#ffe2eb; color:#b85c7a;
+      padding:6px 8px 6px 12px; border-radius:20px;
+      font-size:13px; font-weight:600;
+      border:1px solid #ffd0df;
     }
-
-    body {
-      background: #f2ebe1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 10px;
+    .traveler-chip .minus {
+      background:#ffb6c9; color:#fff; border:none;
+      width:20px; height:20px; border-radius:50%;
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:14px; line-height:1; padding:0; cursor:pointer;
+      box-shadow:none; font-weight:700;
     }
-
-    .app-container {
-      max-width: 400px;
-      width: 100%;
-      height: 780px;
-      background: #fdfaf5;
-      border-radius: 42px;
-      box-shadow: 0 20px 40px rgba(200, 170, 150, 0.25), 0 8px 16px rgba(0, 0, 0, 0.05);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      border: 2px solid #f0e4d8;
-    }
-
-    .status-bar {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 20px 6px;
-      font-size: 12px;
-      color: #b89a8a;
-      font-weight: 500;
-      background: #fdfaf5;
-    }
-
-    .app-header {
-      padding: 8px 20px 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px dashed #f0d9cc;
-      background: #fdfaf5;
-    }
-
-    .app-header h1 {
-      font-size: 20px;
-      font-weight: 600;
-      color: #c96b8a;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .app-header h1 span {
-      font-size: 22px;
-    }
-
-    .save-indicator {
-      font-size: 10px;
-      color: #b0a0a6;
-      background: #f2e6de;
-      padding: 4px 10px;
-      border-radius: 20px;
-      transition: 0.3s;
-    }
-
-    .main-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px 16px 20px;
-      background: #fdfaf5;
-      scrollbar-width: thin;
-      scrollbar-color: #f0c8b8 #f5ece2;
-    }
-
-    .main-content::-webkit-scrollbar { width: 5px; }
-    .main-content::-webkit-scrollbar-thumb { background: #f0c8b8; border-radius: 10px; }
-
-    .card {
-      background: #ffffff;
-      border-radius: 26px;
-      padding: 18px 18px;
-      margin-bottom: 18px;
-      box-shadow: 0 6px 18px rgba(220, 190, 170, 0.18), 0 2px 6px rgba(230, 200, 180, 0.12);
-      border: 1px solid #f0e4d8;
-    }
-
-    .card-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      color: #b85c7a;
-      margin-bottom: 14px;
-      padding-bottom: 6px;
-      border-bottom: 2px dotted #f0d9cc;
-    }
-
-    .card-title i { font-size: 20px; }
-
-    button, .btn {
-      background: #ffb6c9;
-      border: none;
-      border-radius: 30px;
-      padding: 8px 16px;
-      color: white;
-      font-weight: 600;
-      font-size: 13px;
-      cursor: pointer;
-      transition: 0.2s;
-      box-shadow: 0 4px 8px rgba(255, 150, 180, 0.3);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      letter-spacing: 0.3px;
-    }
-
-    button:active { transform: scale(0.96); background: #f79eb6; }
-
-    button.secondary {
-      background: #f5ece2;
-      color: #b85c7a;
-      box-shadow: 0 2px 6px rgba(230, 200, 180, 0.4);
-    }
-
-    button.small { padding: 5px 10px; font-size: 11px; }
-
-    .day-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .day-tab {
-      background: #faf5ee;
-      border: 1.5px solid #f0d9cc;
-      color: #b85c7a;
-      padding: 8px 14px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .day-tab.active {
-      background: #ffb6c9;
-      border-color: #ffb6c9;
-      color: white;
-      box-shadow: 0 4px 8px rgba(255, 140, 170, 0.4);
-    }
-
-    .itinerary-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .itinerary-item {
-      background: #faf7f1;
-      border-radius: 18px;
-      padding: 12px 14px;
-      border-left: 6px solid #ffb6c9;
-      font-size: 13px;
-      color: #5e4a52;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      box-shadow: 0 2px 6px rgba(230, 210, 190, 0.3);
-    }
-
-    .itinerary-item .place {
-      font-weight: 600;
-      color: #a0526e;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      line-height: 1.35;
-    }
-
-    .itinerary-item .transport {
-      font-size: 11px;
-      color: #b08a95;
-      background: #f5ece2;
-      padding: 4px 8px;
-      border-radius: 12px;
-      margin-top: 4px;
-      display: inline-block;
-      width: fit-content;
-      line-height: 1.5;
-    }
-
-    .map-link {
-      font-size: 11px;
-      color: #e06b8e;
-      text-decoration: none;
-      background: #ffe2eb;
-      padding: 3px 10px;
-      border-radius: 16px;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-weight: 500;
-      transition: 0.2s;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .map-link:active { background: #ffb6c9; color: white; }
-
-    input, select, textarea {
-      background: #faf6f0;
-      border: 1.5px solid #f0ddd2;
-      border-radius: 30px;
-      padding: 10px 14px;
-      font-size: 13px;
-      width: 100%;
-      outline: none;
-      color: #4f3a42;
-      transition: 0.2s;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #ffb6c9;
-      background: #ffffff;
-    }
-
-    label {
-      font-size: 12px;
-      color: #b85c7a;
-      margin-bottom: 4px;
-      display: block;
-      font-weight: 500;
-    }
-
-    .form-row { margin-bottom: 12px; }
-
-    .flex-row { display: flex; gap: 8px; align-items: center; }
-    .flex-row > * { flex: 1; }
-
-    .expense-item {
-      background: #faf7f1;
-      border-radius: 20px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      border: 1px solid #f0e4d8;
-      font-size: 13px;
-    }
-
-    .expense-item.settled {
-      opacity: 0.6;
-      text-decoration: line-through;
-      background: #f3ede6;
-    }
-
-    .expense-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
-
-    .expense-name { font-weight: 600; color: #b85c7a; }
-    .expense-amount { font-weight: 600; color: #e06b8e; }
-    .expense-detail { font-size: 11px; color: #937a83; margin-bottom: 4px; }
-    .expense-actions { display: flex; gap: 6px; justify-content: flex-end; margin-top: 6px; }
-
-    .settle-card {
-      background: #faf3ec;
-      border-radius: 18px;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 13px;
-      border: 1px dashed #ffb6c9;
-    }
-
-    .hidden { display: none !important; }
-
-    .bottom-nav {
-      display: flex;
-      justify-content: space-around;
-      padding: 8px 0 12px;
-      background: #fdfaf5;
-      border-top: 2px solid #f0e4d8;
-      border-radius: 0 0 42px 42px;
-    }
-
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
-      font-size: 10px;
-      color: #b89a8a;
-      background: none;
-      border: none;
-      padding: 4px 10px;
-      border-radius: 20px;
-      box-shadow: none;
-    }
-
-    .nav-item.active {
-      color: #e06b8e;
-      font-weight: 600;
-      background: #f7ede4;
-    }
-
-    .nav-item i { font-size: 20px; line-height: 1; }
-    .nav-item:active { transform: scale(0.94); background: #f5ece2; }
-
-    .hint {
-      font-size: 10px;
-      color: #b0a0a6;
-      text-align: center;
-      margin-top: 4px;
-    }
-
-    .current-day-label {
-      font-size: 11px;
-      color: #b08a95;
-      background: #faf3ec;
-      border-radius: 14px;
-      padding: 5px 10px;
-      margin-bottom: 10px;
-      display: inline-block;
-    }
-
-    /* 文件列表 */
-    .file-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #faf7f1;
-      border-radius: 16px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      border: 1px solid #f0e4d8;
-    }
-
-    .file-thumb {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
-      background: #f5ece2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-
-    .file-thumb-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 12px;
-      display: block;
-    }
-
-    .file-info { flex: 1; min-width: 0; }
-
-    .file-name {
-      font-size: 12px;
-      font-weight: 600;
-      color: #a0526e;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .file-meta {
-      font-size: 10px;
-      color: #b08a95;
-      margin-top: 2px;
-    }
-
-    .file-actions { display: flex; gap: 4px; flex-shrink: 0; }
-
-    .upload-zone {
-      border: 2px dashed #f0d9cc;
-      border-radius: 20px;
-      padding: 18px;
-      text-align: center;
-      background: #faf7f1;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .upload-zone:active { background: #f5ece2; }
-
-    .upload-zone .up-icon { font-size: 32px; }
-    .upload-zone .up-title { font-size: 13px; color: #b85c7a; font-weight: 600; margin-top: 6px; }
-    .upload-zone .up-sub { font-size: 11px; color: #b08a95; margin-top: 4px; }
+    .traveler-chip .minus:active { background:#f79eb6; transform:scale(.92); }
+    .traveler-add-row { display:flex; gap:8px; }
+    .traveler-add-row input { flex:1; }
+    .traveler-add-row button { flex:0 0 auto; padding:10px 16px; }
+    .empty-travelers { font-size:12px; color:#b08a95; margin-bottom:10px; }
   </style>
 </head>
 <body>
@@ -418,7 +102,6 @@
     <span>🇹🇭 曼谷 2026</span>
     <span id="saveStatus">已儲存</span>
   </div>
-
   <div class="app-header">
     <h1><span>🧸</span> 曼谷旅帳</h1>
     <div class="save-indicator" id="syncIndicator">🔄 自動儲存</div>
@@ -430,7 +113,7 @@
       <div class="card">
         <div class="card-title"><i>📅</i> 每日行程</div>
         <div class="day-tabs" id="dayTabsContainer"></div>
-        <div class="flex-row" style="margin-bottom: 12px;">
+        <div class="flex-row" style="margin-bottom:12px;">
           <input type="text" id="newDayName" placeholder="新日期 e.g. Day 6｜12/02" style="flex:2;">
           <button class="small" id="addDayBtn" style="flex:1;">+ 新增</button>
         </div>
@@ -439,18 +122,9 @@
       <div class="card">
         <div class="card-title"><i>➕</i> 新增行程</div>
         <div class="current-day-label" id="currentDayLabel">加入至：—</div>
-        <div class="form-row">
-          <label>地點名稱</label>
-          <input type="text" id="placeName" placeholder="例：ICONSIAM">
-        </div>
-        <div class="form-row">
-          <label>Google 地圖導航連結 (可貼上網址)</label>
-          <input type="text" id="placeMapUrl" placeholder="https://www.google.com/maps/search/?api=1&query=...">
-        </div>
-        <div class="form-row">
-          <label>交通說明 (精確到出口)</label>
-          <input type="text" id="placeTransport" placeholder="例：BTS Chit Lom 站 2 號出口步行 5 分鐘">
-        </div>
+        <div class="form-row"><label>地點名稱</label><input type="text" id="placeName" placeholder="例：ICONSIAM"></div>
+        <div class="form-row"><label>Google 地圖導航連結</label><input type="text" id="placeMapUrl" placeholder="https://www.google.com/maps/search/?api=1&query=..."></div>
+        <div class="form-row"><label>交通說明 (精確到出口)</label><input type="text" id="placeTransport" placeholder="例：BTS Chit Lom 站 2 號出口步行 5 分鐘"></div>
         <button id="addItineraryBtn" style="width:100%;">✨ 加入行程</button>
       </div>
     </div>
@@ -459,68 +133,57 @@
     <div id="tab-map" class="tab-pane hidden">
       <div class="card">
         <div class="card-title"><i>🗺️</i> 地圖與交通</div>
-        <p style="font-size:12px; color:#b08a95; margin-bottom:12px;">每個行程均附 Google 地圖連結，點擊即可導航</p>
+        <p style="font-size:12px;color:#b08a95;margin-bottom:12px;">每個行程均附 Google 地圖連結，點擊即可導航</p>
         <div id="mapItineraryList" class="itinerary-list"></div>
       </div>
     </div>
 
     <!-- 記帳 -->
     <div id="tab-expense" class="tab-pane hidden">
+      <!-- 同行者管理 -->
+      <div class="card">
+        <div class="card-title"><i>👥</i> 同行者管理 <span style="font-size:11px;color:#b08a95;font-weight:400;margin-left:auto;" id="travelerCount">0 / 5</span></div>
+        <div class="traveler-chips" id="travelerChips"></div>
+        <div class="traveler-add-row">
+          <input type="text" id="newTravelerName" placeholder="輸入名字" maxlength="12">
+          <button id="addTravelerBtn" class="small">➕ 新增</button>
+        </div>
+        <p class="hint" style="text-align:left;margin-top:8px;">最多 5 位同行者</p>
+      </div>
+
+      <!-- 新增支出 -->
       <div class="card">
         <div class="card-title"><i>💰</i> 新增支出</div>
-        <div class="form-row">
-          <label>項目名稱</label>
-          <input type="text" id="expenseName" placeholder="例：午餐壽司">
-        </div>
-        <div class="form-row">
-          <label>總金額</label>
-          <input type="number" id="expenseTotal" placeholder="0" step="0.01">
-        </div>
+        <div class="form-row"><label>項目名稱</label><input type="text" id="expenseName" placeholder="例：午餐壽司"></div>
+        <div class="form-row"><label>總金額</label><input type="number" id="expenseTotal" placeholder="0" step="0.01"></div>
         <div class="flex-row">
-          <div style="flex:1">
-            <label>幣種</label>
-            <select id="expenseCurrency">
-              <option value="THB">泰銖 (THB)</option>
-              <option value="HKD">港幣 (HKD)</option>
-            </select>
+          <div style="flex:1"><label>幣種</label>
+            <select id="expenseCurrency"><option value="THB">泰銖 (THB)</option><option value="HKD">港幣 (HKD)</option></select>
           </div>
-          <div style="flex:1">
-            <label>付款方式</label>
-            <select id="expensePayMethod">
-              <option value="現金">現金</option>
-              <option value="信用卡">信用卡</option>
-              <option value="轉帳">轉帳</option>
-            </select>
+          <div style="flex:1"><label>付款方式</label>
+            <select id="expensePayMethod"><option value="現金">現金</option><option value="信用卡">信用卡</option><option value="轉帳">轉帳</option></select>
           </div>
         </div>
         <div class="form-row">
-          <label>參與人數 (總人數)</label>
-          <input type="number" id="expenseParticipants" value="2" min="1">
+          <label>誰負責付款</label>
+          <select id="expensePayer"></select>
         </div>
-        <div class="form-row">
-          <label>誰負責付款 (人名)</label>
-          <input type="text" id="expensePayer" placeholder="例：A">
-        </div>
-        <div class="form-row">
-          <label>分攤方式</label>
-          <select id="splitType">
-            <option value="equal">人均 (總額 / 人數)</option>
-            <option value="custom">分開付 (手動輸入每人金額)</option>
-          </select>
+        <div class="form-row"><label>分攤方式</label>
+          <select id="splitType"><option value="equal">人均 (總額 ÷ 同行者人數)</option><option value="custom">分開付 (手動輸入每人金額)</option></select>
         </div>
         <div id="customSplitContainer" class="hidden">
           <label>參與人名與金額 (每行一組: 人名,金額)</label>
           <textarea id="customSplitInput" rows="2" placeholder="A,2500&#10;B,2500"></textarea>
         </div>
-        <button id="addExpenseBtn" style="width:100%; margin-top:8px;">📝 新增支出</button>
+        <button id="addExpenseBtn" style="width:100%;margin-top:8px;">📝 新增支出</button>
       </div>
 
+      <!-- 支出列表 + 即時結算 -->
       <div class="card">
-        <div class="card-title"><i>🧾</i> 支出列表 & 結算</div>
+        <div class="card-title"><i>🧾</i> 支出列表</div>
         <div id="expenseList"></div>
-        <button id="settleAllBtn" class="secondary" style="width:100%; margin-top:12px;">💸 統一結清 (未結清項目)</button>
-        <div id="settlementResult" class="settle-card" style="margin-top:12px;"></div>
-        <div id="settlementHistory" style="margin-top:12px;"></div>
+        <div class="card-title" style="margin-top:16px;margin-bottom:8px;font-size:14px;border-bottom:2px dotted #f0d9cc;padding-bottom:6px;"><i>💡</i> 即時結算</div>
+        <div id="settlementResult" class="settle-card"></div>
       </div>
     </div>
 
@@ -534,654 +197,783 @@
           <div class="up-sub">支援 PDF、JPG、PNG 等圖片・可一次選多個</div>
         </div>
         <input type="file" id="fileInput" accept="image/*,application/pdf" multiple style="display:none;">
-        <p class="hint" style="margin-top:8px;">單一檔案上限 20MB，檔案儲存在此瀏覽器</p>
+        <p class="hint" style="margin-top:8px;">單一檔案上限 20MB</p>
       </div>
-
       <div class="card">
         <div class="card-title"><i>🗂️</i> 已上載文件</div>
         <div id="fileList"></div>
       </div>
     </div>
+
+    <!-- 同步與備份 -->
+    <div id="tab-backup" class="tab-pane hidden">
+      <div class="card">
+        <div class="card-title"><i>☁️</i> Supabase 雲端同步</div>
+        <p style="font-size:12px;color:#b08a95;line-height:1.7;margin-bottom:12px;">
+          填好以下三個值，兩部裝置就會自動同步。<br>
+          兩部裝置都要填<b>相同</b>嘅同步 ID。
+        </p>
+        <div class="form-row"><label>Supabase Project URL</label><input type="text" id="syncUrl" placeholder="https://xxxx.supabase.co"></div>
+        <div class="form-row"><label>Supabase anon / public key</label><input type="text" id="syncKey" placeholder="eyJhbGciOi..."></div>
+        <div class="form-row"><label>同步 ID（自訂密碼，兩部裝置必須相同）</label><input type="text" id="syncId" placeholder="例：bangkok-2026-family"></div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <button id="saveSyncConfigBtn" style="flex:1;">💾 儲存並連線</button>
+          <button id="disableSyncBtn" class="secondary" style="flex:1;">關閉雲同步</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <button id="pushBtn" class="secondary" style="flex:1;">⬆️ 推送到雲端</button>
+          <button id="pullBtn" class="secondary" style="flex:1;">⬇️ 從雲端拉取</button>
+        </div>
+        <div class="sync-status" id="syncStatus"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><i>📦</i> 離線備份 (ZIP)</div>
+        <p style="font-size:12px;color:#b08a95;line-height:1.7;margin-bottom:12px;">如果唔想用雲端，可以用 ZIP 手動備份／還原。</p>
+        <div class="backup-box">
+          <div class="b-icon">📦</div>
+          <div class="b-title">匯出全部資料</div>
+          <div class="b-desc">包含行程、同行者、記帳、所有上載文件</div>
+          <button id="exportBtn" style="width:100%;">⬇️ 匯出 ZIP 備份</button>
+        </div>
+        <div class="backup-box">
+          <div class="b-icon">📥</div>
+          <div class="b-title">匯入備份</div>
+          <div class="b-desc">揀之前匯出嘅 ZIP 檔，會覆蓋目前所有資料</div>
+          <input type="file" id="importInput" accept=".zip,application/zip" style="display:none;">
+          <button id="importBtn" class="secondary" style="width:100%;">📂 選擇 ZIP 檔匯入</button>
+        </div>
+        <div class="progress-text" id="backupStatus"></div>
+      </div>
+    </div>
   </div>
 
-  <!-- 底部導航 -->
   <div class="bottom-nav">
     <button class="nav-item active" data-tab="itinerary"><i>📅</i> 行程</button>
     <button class="nav-item" data-tab="map"><i>🗺️</i> 地圖</button>
     <button class="nav-item" data-tab="expense"><i>💰</i> 記帳</button>
     <button class="nav-item" data-tab="files"><i>📁</i> 文件</button>
+    <button class="nav-item" data-tab="backup"><i>⚙️</i> 同步</button>
   </div>
 </div>
 
 <script>
-  // ---------- 曼谷 2026 預設行程 ----------
+  // ---------- 預設行程 ----------
   const MAP_SEARCH = 'https://www.google.com/maps/search/?api=1&query=';
-
   const BANGKOK_DAYS = [
-    {
-      name: 'Day 0｜11/26',
-      items: [
-        { place: '素萬那普機場 Suvarnabhumi Airport（23:15 抵達 EK385）', mapUrl: MAP_SEARCH + 'Suvarnabhumi+Airport+Bangkok', transport: '抵達後通關取行李，前往酒店 Check-in' },
-        { place: 'Cross Vibe Bangkok Sukhumvit（BTS On Nut）', mapUrl: MAP_SEARCH + 'Cross+Vibe+Bangkok+Sukhumvit', transport: 'Airport Rail Link 至 Phaya Thai 轉 BTS 至 On Nut 站 3 號出口；或 Grab 直達約 30–40 分鐘' }
-      ]
-    },
-    {
-      name: 'Day 1｜11/27',
-      items: [
-        { place: 'QSNCC 領取選手包（12:00–15:00）', mapUrl: MAP_SEARCH + 'Queen+Sirikit+National+Convention+Centre+Bangkok', transport: 'MRT Queen Sirikit National Convention Centre 站 3 號出口，步行約 3 分鐘' },
-        { place: 'CentralWorld / Chit Lom 逛街（15:30–19:00）', mapUrl: MAP_SEARCH + 'CentralWorld+Bangkok', transport: 'BTS Chit Lom 站 2 號出口，沿 Skywalk 步行約 5 分鐘｜推薦 Zara、Uniqlo、H&M' },
-        { place: 'Asok 一帶晚餐', mapUrl: MAP_SEARCH + 'Terminal+21+Asok+Bangkok', transport: 'BTS Asok 站 3 號出口／MRT Sukhumvit 站 3 號出口步行 2 分鐘｜推薦 Pad Thai、Mango Sticky Rice' }
-      ]
-    },
-    {
-      name: 'Day 2｜11/28',
-      items: [
-        { place: 'ICONSIAM 逛街 + 河畔（10:00–16:00）', mapUrl: MAP_SEARCH + 'ICONSIAM+Bangkok', transport: 'BTS Saphan Taksin 站 2 號出口 → 轉 Gold Line 至 Charoen Nakhon 站 1 號出口｜推薦 LV、Gucci、Apple、Thai brands' },
-        { place: '河畔散步拍照（16:00–18:00）', mapUrl: MAP_SEARCH + 'ICONSIAM+River+Park+Bangkok', transport: 'ICONSIAM 河濱公園 River Park 沿昭披耶河步道漫步' },
-        { place: 'Tichuca Rooftop Bar 屋頂酒吧', mapUrl: MAP_SEARCH + 'Tichuca+Rooftop+Bar+Bangkok', transport: 'BTS Thong Lo 站 3 號出口步行約 8 分鐘，T-One Building 46 樓' }
-      ]
-    },
-    {
-      name: 'Day 3｜11/29',
-      items: [
-        { place: 'Sanam Luang 10K 馬拉松（06:00–08:30）', mapUrl: MAP_SEARCH + 'Sanam+Luang+Bangkok', transport: '04:30–05:30 出發建議 Grab 直達；或 MRT Sanam Chai 站 1 號出口步行約 10 分鐘' },
-        { place: 'Makkha Health & Spa 按摩恢復（下午）', mapUrl: MAP_SEARCH + 'Makkha+Health+and+Spa+Bangkok', transport: 'BTS Asok 站 4 號出口步行約 5 分鐘｜推薦 Thai Massage、Aroma Oil、Head Spa' },
-        { place: 'Copper Beyond Buffet（Gaysorn Amarin）晚餐', mapUrl: MAP_SEARCH + 'Copper+Beyond+Buffet+Gaysorn+Amarin+Bangkok', transport: 'BTS Chit Lom 站 1 號出口，經 Skywalk 直達 Gaysorn Amarin 4 樓｜需提前預約' }
-      ]
-    },
-    {
-      name: 'Day 4｜11/30',
-      items: [
-        { place: 'SANGARUN.THAI COSTUME 泰服體驗（09:00–13:00）', mapUrl: MAP_SEARCH + 'Sangarun+Thai+Costume+Bangkok', transport: 'BTS Saphan Taksin 站 2 號出口 → 搭船至 Tha Tien 碼頭，步行約 5 分鐘（Wat Arun 附近）' },
-        { place: '鄭王廟 Wat Arun 探索拍照（下午）', mapUrl: MAP_SEARCH + 'Wat+Arun+Bangkok', transport: 'Tha Tien 碼頭搭渡船至 Wat Arun 碼頭，船程約 5 分鐘' }
-      ]
-    },
-    {
-      name: 'Day 5｜12/01',
-      items: [
-        { place: '素萬那普機場（回程 13:45 EK384）', mapUrl: MAP_SEARCH + 'Suvarnabhumi+Airport+Bangkok', transport: '約 11:00 退房出發，BTS On Nut → Phaya Thai 轉 Airport Rail Link；或 Grab 約 40 分鐘' }
-      ]
-    }
+    { name:'Day 0｜11/26', items:[
+      { place:'素萬那普機場 Suvarnabhumi Airport（23:15 抵達 EK385）', mapUrl:MAP_SEARCH+'Suvarnabhumi+Airport+Bangkok', transport:'抵達後通關取行李，前往酒店 Check-in' },
+      { place:'Cross Vibe Bangkok Sukhumvit（BTS On Nut）', mapUrl:MAP_SEARCH+'Cross+Vibe+Bangkok+Sukhumvit', transport:'Airport Rail Link 至 Phaya Thai 轉 BTS 至 On Nut 站 3 號出口；或 Grab 直達約 30–40 分鐘' }
+    ]},
+    { name:'Day 1｜11/27', items:[
+      { place:'QSNCC 領取選手包（12:00–15:00）', mapUrl:MAP_SEARCH+'Queen+Sirikit+National+Convention+Centre+Bangkok', transport:'MRT Queen Sirikit National Convention Centre 站 3 號出口，步行約 3 分鐘' },
+      { place:'CentralWorld / Chit Lom 逛街（15:30–19:00）', mapUrl:MAP_SEARCH+'CentralWorld+Bangkok', transport:'BTS Chit Lom 站 2 號出口，沿 Skywalk 步行約 5 分鐘｜推薦 Zara、Uniqlo、H&M' },
+      { place:'Asok 一帶晚餐', mapUrl:MAP_SEARCH+'Terminal+21+Asok+Bangkok', transport:'BTS Asok 站 3 號出口／MRT Sukhumvit 站 3 號出口步行 2 分鐘' }
+    ]},
+    { name:'Day 2｜11/28', items:[
+      { place:'ICONSIAM 逛街 + 河畔（10:00–16:00）', mapUrl:MAP_SEARCH+'ICONSIAM+Bangkok', transport:'BTS Saphan Taksin 站 2 號出口 → 轉 Gold Line 至 Charoen Nakhon 站 1 號出口' },
+      { place:'河畔散步拍照（16:00–18:00）', mapUrl:MAP_SEARCH+'ICONSIAM+River+Park+Bangkok', transport:'ICONSIAM 河濱公園 River Park 沿昭披耶河步道漫步' },
+      { place:'Tichuca Rooftop Bar 屋頂酒吧', mapUrl:MAP_SEARCH+'Tichuca+Rooftop+Bar+Bangkok', transport:'BTS Thong Lo 站 3 號出口步行約 8 分鐘，T-One Building 46 樓' }
+    ]},
+    { name:'Day 3｜11/29', items:[
+      { place:'Sanam Luang 10K 馬拉松（06:00–08:30）', mapUrl:MAP_SEARCH+'Sanam+Luang+Bangkok', transport:'04:30–05:30 出發建議 Grab 直達；或 MRT Sanam Chai 站 1 號出口步行約 10 分鐘' },
+      { place:'Makkha Health & Spa 按摩恢復（下午）', mapUrl:MAP_SEARCH+'Makkha+Health+and+Spa+Bangkok', transport:'BTS Asok 站 4 號出口步行約 5 分鐘' },
+      { place:'Copper Beyond Buffet（Gaysorn Amarin）晚餐', mapUrl:MAP_SEARCH+'Copper+Beyond+Buffet+Gaysorn+Amarin+Bangkok', transport:'BTS Chit Lom 站 1 號出口，經 Skywalk 直達 Gaysorn Amarin 4 樓｜需提前預約' }
+    ]},
+    { name:'Day 4｜11/30', items:[
+      { place:'SANGARUN.THAI COSTUME 泰服體驗（09:00–13:00）', mapUrl:MAP_SEARCH+'Sangarun+Thai+Costume+Bangkok', transport:'BTS Saphan Taksin 站 2 號出口 → 搭船至 Tha Tien 碼頭，步行約 5 分鐘' },
+      { place:'鄭王廟 Wat Arun 探索拍照（下午）', mapUrl:MAP_SEARCH+'Wat+Arun+Bangkok', transport:'Tha Tien 碼頭搭渡船至 Wat Arun 碼頭，船程約 5 分鐘' }
+    ]},
+    { name:'Day 5｜12/01', items:[
+      { place:'素萬那普機場（回程 13:45 EK384）', mapUrl:MAP_SEARCH+'Suvarnabhumi+Airport+Bangkok', transport:'約 11:00 退房出發，BTS On Nut → Phaya Thai 轉 Airport Rail Link；或 Grab 約 40 分鐘' }
+    ]}
   ];
 
-  // ---------- 資料 ----------
+  // ---------- 常數 ----------
   const STORAGE_KEY = 'pinkTravelAppData_v2';
+  const SYNC_CONFIG_KEY = 'travelSyncConfig_v1';
   const LEGACY_KEY = 'pinkTravelAppData';
-
-  let appData = {
-    days: [],
-    currentDay: '',
-    expenses: [],
-    settlementHistory: [],
-    files: [],
-    activeTab: 'itinerary'
-  };
-
-  const fileUrlCache = new Map(); // id -> objectURL
-
-  function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
-
-  // ---------- IndexedDB 檔案儲存 ----------
   const DB_NAME = 'travelAppFilesDB';
   const DB_STORE = 'files';
+  const MAX_TRAVELERS = 5;
 
-  function openDB() {
-    return new Promise((resolve, reject) => {
-      if (!window.indexedDB) return reject(new Error('瀏覽器不支援 IndexedDB'));
-      const req = indexedDB.open(DB_NAME, 1);
-      req.onupgradeneeded = e => {
-        const db = e.target.result;
-        if (!db.objectStoreNames.contains(DB_STORE)) db.createObjectStore(DB_STORE);
+  // ---------- 狀態 ----------
+  let appData = {
+    days: [], currentDay: '',
+    travelers: ['A','B'],
+    expenses: [],
+    files: [],
+    activeTab: 'itinerary', lastUpdatedAt: ''
+  };
+  let syncConfig = { url:'', key:'', syncId:'', enabled:false };
+  let supabaseClient = null;
+  let syncPushTimer = null;
+  const fileUrlCache = new Map();
+
+  function clone(o){return JSON.parse(JSON.stringify(o));}
+
+  // ---------- IndexedDB ----------
+  function openDB(){
+    return new Promise((res,rej)=>{
+      if(!window.indexedDB) return rej(new Error('no IDB'));
+      const r=indexedDB.open(DB_NAME,1);
+      r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(DB_STORE))db.createObjectStore(DB_STORE);};
+      r.onsuccess=e=>res(e.target.result);
+      r.onerror=e=>rej(e.target.error);
+    });
+  }
+  async function saveFileToDB(id,blob){const db=await openDB();return new Promise((res,rej)=>{const t=db.transaction(DB_STORE,'readwrite');t.objectStore(DB_STORE).put(blob,id);t.oncomplete=()=>res();t.onerror=e=>rej(e.target.error);});}
+  async function getFileFromDB(id){const db=await openDB();return new Promise((res,rej)=>{const t=db.transaction(DB_STORE,'readonly');const r=t.objectStore(DB_STORE).get(id);r.onsuccess=()=>res(r.result);r.onerror=e=>rej(e.target.error);});}
+  async function deleteFileFromDB(id){const db=await openDB();return new Promise((res,rej)=>{const t=db.transaction(DB_STORE,'readwrite');t.objectStore(DB_STORE).delete(id);t.oncomplete=()=>res();t.onerror=e=>rej(e.target.error);});}
+  async function getFileObjectURL(meta){
+    if(fileUrlCache.has(meta.id))return fileUrlCache.get(meta.id);
+    try{const b=await getFileFromDB(meta.id);if(!b)return null;const u=URL.createObjectURL(b);fileUrlCache.set(meta.id,u);return u;}catch(e){return null;}
+  }
+
+  // ---------- 同步設定 ----------
+  function loadSyncConfig(){
+    try{const s=localStorage.getItem(SYNC_CONFIG_KEY);if(s)syncConfig={...syncConfig,...JSON.parse(s)};}catch(e){}
+  }
+  function saveSyncConfig(){ localStorage.setItem(SYNC_CONFIG_KEY,JSON.stringify(syncConfig)); }
+  function initSupabase(){
+    if(!syncConfig.enabled)return;
+    if(!window.supabase){setSyncStatus('❌ 無法載入 Supabase SDK（檢查網絡）');return;}
+    try{supabaseClient=window.supabase.createClient(syncConfig.url,syncConfig.key);setSyncStatus('🟢 雲端已連線');}
+    catch(e){console.error(e);setSyncStatus('❌ Supabase 連線失敗');}
+  }
+  function setSyncStatus(m){const el=document.getElementById('syncStatus');if(el)el.textContent=m||'';}
+
+  // ---------- 推送 / 拉取 ----------
+  async function pushToCloud(silent){
+    if(!supabaseClient||!syncConfig.syncId)return false;
+    try{
+      if(!silent)setSyncStatus('⏳ 上傳中…');
+      const now=new Date().toISOString();
+      appData.lastUpdatedAt=now;
+      for(const f of appData.files){
+        if(!f.cloudPath){
+          try{
+            const blob=await getFileFromDB(f.id);
+            if(blob){
+              const path=`${syncConfig.syncId}/${f.id}`;
+              const {error}=await supabaseClient.storage.from('files').upload(path,blob,{upsert:true,contentType:f.type||'application/octet-stream'});
+              if(!error)f.cloudPath=path;
+            }
+          }catch(e){console.warn('文件上傳失敗',e);}
+        }
+      }
+      const payload={
+        days:appData.days, currentDay:appData.currentDay,
+        travelers:appData.travelers,
+        expenses:appData.expenses,
+        files:appData.files, activeTab:'itinerary', lastUpdatedAt:now
       };
-      req.onsuccess = e => resolve(e.target.result);
-      req.onerror = e => reject(e.target.error);
-    });
-  }
-
-  async function saveFileToDB(id, blob) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(DB_STORE, 'readwrite');
-      tx.objectStore(DB_STORE).put(blob, id);
-      tx.oncomplete = () => resolve();
-      tx.onerror = e => reject(e.target.error);
-    });
-  }
-
-  async function getFileFromDB(id) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(DB_STORE, 'readonly');
-      const req = tx.objectStore(DB_STORE).get(id);
-      req.onsuccess = () => resolve(req.result);
-      req.onerror = e => reject(e.target.error);
-    });
-  }
-
-  async function deleteFileFromDB(id) {
-    const db = await openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(DB_STORE, 'readwrite');
-      tx.objectStore(DB_STORE).delete(id);
-      tx.oncomplete = () => resolve();
-      tx.onerror = e => reject(e.target.error);
-    });
-  }
-
-  async function getFileObjectURL(meta) {
-    if (fileUrlCache.has(meta.id)) return fileUrlCache.get(meta.id);
-    try {
-      const blob = await getFileFromDB(meta.id);
-      if (!blob) return null;
-      const url = URL.createObjectURL(blob);
-      fileUrlCache.set(meta.id, url);
-      return url;
-    } catch (e) {
-      console.warn('讀取檔案失敗', e);
-      return null;
+      const {error}=await supabaseClient.from('trips').upsert({id:syncConfig.syncId,data:payload,updated_at:now});
+      if(error)throw error;
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));
+      setSyncStatus('✅ 已同步到雲端 '+new Date().toLocaleTimeString('zh-HK'));
+      return true;
+    }catch(e){
+      console.error('推送失敗',e);
+      setSyncStatus('❌ 推送失敗：'+(e.message||''));
+      return false;
     }
+  }
+
+  async function pullFromCloud(silent){
+    if(!supabaseClient||!syncConfig.syncId)return false;
+    try{
+      if(!silent)setSyncStatus('⏳ 下載中…');
+      const {data,error}=await supabaseClient.from('trips').select('data,updated_at').eq('id',syncConfig.syncId).maybeSingle();
+      if(error)throw error;
+      if(!data){setSyncStatus('ℹ️ 雲端暫無資料，請先推送');return false;}
+      const c=data.data||{};
+      appData.days=c.days||[];
+      appData.currentDay=c.currentDay||(appData.days[0]?appData.days[0].name:'');
+      appData.travelers=Array.isArray(c.travelers)&&c.travelers.length?c.travelers:['A','B'];
+      appData.expenses=c.expenses||[];
+      appData.files=c.files||[];
+      appData.activeTab='itinerary';
+      appData.lastUpdatedAt=c.lastUpdatedAt||data.updated_at;
+      localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));
+      renderAll();
+      setSyncStatus('✅ 已從雲端同步 '+new Date().toLocaleTimeString('zh-HK'));
+      return true;
+    }catch(e){
+      console.error('拉取失敗',e);
+      setSyncStatus('❌ 拉取失敗：'+(e.message||''));
+      return false;
+    }
+  }
+
+  async function pullIfCloudNewer(){
+    if(!supabaseClient)return;
+    try{
+      const {data,error}=await supabaseClient.from('trips').select('data,updated_at').eq('id',syncConfig.syncId).maybeSingle();
+      if(error||!data)return;
+      const cloudTime=(data.data&&data.data.lastUpdatedAt)||data.updated_at||'';
+      const localTime=appData.lastUpdatedAt||'';
+      if(!localTime||cloudTime>localTime){
+        await pullFromCloud(true);
+      }
+    }catch(e){console.warn('檢查雲端失敗',e);}
+  }
+
+  function schedulePush(){
+    if(!supabaseClient||!syncConfig.enabled)return;
+    clearTimeout(syncPushTimer);
+    syncPushTimer=setTimeout(()=>pushToCloud(true),2000);
   }
 
   // ---------- 載入 / 儲存 ----------
-  function loadData() {
-    const stored = localStorage.getItem(STORAGE_KEY);
-
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        appData = { ...appData, ...parsed };
-      } catch (e) { console.warn('載入失敗', e); }
-
-      if (!Array.isArray(appData.days)) appData.days = [];
-      if (!Array.isArray(appData.expenses)) appData.expenses = [];
-      if (!Array.isArray(appData.settlementHistory)) appData.settlementHistory = [];
-      if (!Array.isArray(appData.files)) appData.files = [];
-
-      if (appData.days.length === 0) {
-        appData.days = clone(BANGKOK_DAYS);
-        appData.currentDay = appData.days[0].name;
-      }
-      if (!appData.currentDay || !appData.days.some(d => d.name === appData.currentDay)) {
-        appData.currentDay = appData.days[0].name;
-      }
-
-      // 若舊存檔的 activeTab 為已刪除的 'rate'，回退到行程頁
-      const validTabs = ['itinerary', 'map', 'expense', 'files'];
-      if (!validTabs.includes(appData.activeTab)) {
-        appData.activeTab = 'itinerary';
-      }
-
+  function loadData(){
+    const stored=localStorage.getItem(STORAGE_KEY);
+    if(stored){
+      try{const p=JSON.parse(stored);appData={...appData,...p};}catch(e){}
+      if(!Array.isArray(appData.days))appData.days=[];
+      if(!Array.isArray(appData.expenses))appData.expenses=[];
+      if(!Array.isArray(appData.files))appData.files=[];
+      if(!Array.isArray(appData.travelers)||!appData.travelers.length)appData.travelers=['A','B'];
+      if(appData.travelers.length>MAX_TRAVELERS)appData.travelers=appData.travelers.slice(0,MAX_TRAVELERS);
+      if(appData.days.length===0){appData.days=clone(BANGKOK_DAYS);appData.currentDay=appData.days[0].name;}
+      if(!appData.currentDay||!appData.days.some(d=>d.name===appData.currentDay)){appData.currentDay=appData.days[0].name;}
+      const valid=['itinerary','map','expense','files','backup'];
+      if(!valid.includes(appData.activeTab))appData.activeTab='itinerary';
+      // 舊資料清理：移除 settled / settlementHistory 依賴
+      if(appData.settlementHistory)delete appData.settlementHistory;
       renderAll();
-    } else {
-      let legacy = null;
-      try {
-        const raw = localStorage.getItem(LEGACY_KEY);
-        if (raw) legacy = JSON.parse(raw);
-      } catch (e) { /* ignore */ }
-
-      appData.days = clone(BANGKOK_DAYS);
-      appData.currentDay = appData.days[0].name;
-      appData.activeTab = 'itinerary';
-      appData.files = [];
-      appData.expenses = (legacy && Array.isArray(legacy.expenses) && legacy.expenses.length)
-        ? legacy.expenses
+    }else{
+      let legacy=null;
+      try{const raw=localStorage.getItem(LEGACY_KEY);if(raw)legacy=JSON.parse(raw);}catch(e){}
+      appData.days=clone(BANGKOK_DAYS);
+      appData.currentDay=appData.days[0].name;
+      appData.activeTab='itinerary';
+      appData.files=[];
+      appData.travelers=['A','B'];
+      appData.expenses=(legacy&&Array.isArray(legacy.expenses)&&legacy.expenses.length)
+        ? legacy.expenses.map(e=>({id:e.id||Date.now()+Math.random(),name:e.name,total:e.total,currency:e.currency,payMethod:e.payMethod||'現金',payer:e.payer,splitType:e.splitType,customSplit:e.customSplit||[]}))
         : [
-            { id: Date.now() + 1, name: '午餐壽司', total: 5000, currency: 'THB', payMethod: '現金', participants: 2, payer: 'A', splitType: 'custom', customSplit: [{ name: 'A', amount: 2500 }, { name: 'B', amount: 2500 }], settled: false, settledAt: '' },
-            { id: Date.now() + 2, name: '晚餐燒肉', total: 6000, currency: 'THB', payMethod: '信用卡', participants: 2, payer: 'B', splitType: 'custom', customSplit: [{ name: 'A', amount: 3000 }, { name: 'B', amount: 3000 }], settled: false, settledAt: '' }
+            { id: Date.now()+1, name:'午餐壽司', total:5000, currency:'THB', payMethod:'現金', payer:'A', splitType:'custom', customSplit:[{name:'A',amount:2500},{name:'B',amount:2500}] },
+            { id: Date.now()+2, name:'晚餐燒肉', total:6000, currency:'THB', payMethod:'信用卡', payer:'B', splitType:'custom', customSplit:[{name:'A',amount:3000},{name:'B',amount:3000}] }
           ];
-      appData.settlementHistory = (legacy && Array.isArray(legacy.settlementHistory)) ? legacy.settlementHistory : [];
-
       saveData();
     }
   }
 
-  function saveData() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-    } catch (e) { console.warn('儲存失敗', e); }
-
-    const statusEl = document.getElementById('saveStatus');
-    const syncEl = document.getElementById('syncIndicator');
-    if (statusEl) statusEl.innerText = '已儲存 ✓';
-    if (syncEl) {
-      syncEl.innerText = '💾 儲存中…';
-      setTimeout(() => { syncEl.innerText = '🔄 自動儲存'; }, 600);
-    }
+  function saveData(){
+    appData.lastUpdatedAt=new Date().toISOString();
+    try{localStorage.setItem(STORAGE_KEY,JSON.stringify(appData));}catch(e){}
+    const statusEl=document.getElementById('saveStatus');
+    const syncEl=document.getElementById('syncIndicator');
+    if(statusEl)statusEl.innerText='已儲存 ✓';
+    if(syncEl){syncEl.innerText='💾 儲存中…';setTimeout(()=>{syncEl.innerText='🔄 自動儲存';},600);}
     renderAll();
+    schedulePush();
   }
 
-  // ---------- 行程 ----------
-  function renderDayTabs() {
-    const container = document.getElementById('dayTabsContainer');
-    if (!container) return;
-    container.innerHTML = '';
-    if (!appData.days.length) {
-      container.innerHTML = '<span style="font-size:12px;color:#b08a95;">尚無日期，請新增</span>';
+  // ---------- 渲染 ----------
+  function renderDayTabs(){
+    const c=document.getElementById('dayTabsContainer');
+    if(!c)return;
+    c.innerHTML='';
+    if(!appData.days.length){c.innerHTML='<span style="font-size:12px;color:#b08a95;">尚無日期，請新增</span>';return;}
+    appData.days.forEach(day=>{
+      const b=document.createElement('button');
+      b.className=`day-tab ${appData.currentDay===day.name?'active':''}`;
+      b.textContent=day.name;
+      b.onclick=()=>{appData.currentDay=day.name;saveData();};
+      c.appendChild(b);
+    });
+    const lb=document.getElementById('currentDayLabel');
+    if(lb)lb.textContent='加入至：'+(appData.currentDay||'—');
+  }
+
+  function buildItem(item,mt){
+    return `<div class="place"><span>📍 ${item.place}</span><a class="map-link" href="${item.mapUrl||'#'}" target="_blank" rel="noopener">🗺️ ${mt}</a></div><div class="transport">🚇 ${item.transport||'無交通說明'}</div>`;
+  }
+
+  function renderItineraryList(){
+    const c=document.getElementById('itineraryList');
+    const m=document.getElementById('mapItineraryList');
+    if(!c||!m)return;
+    c.innerHTML='';m.innerHTML='';
+    const cur=appData.days.find(d=>d.name===appData.currentDay);
+    if(!cur||!cur.items.length){
+      c.innerHTML='<p style="font-size:13px;color:#b08a95;text-align:center;">✨ 尚無行程，快新增吧</p>';
+      m.innerHTML='<p style="font-size:13px;color:#b08a95;text-align:center;">✨ 尚無地點</p>';
       return;
     }
-    appData.days.forEach(day => {
-      const btn = document.createElement('button');
-      btn.className = `day-tab ${appData.currentDay === day.name ? 'active' : ''}`;
-      btn.textContent = day.name;
-      btn.onclick = () => { appData.currentDay = day.name; saveData(); };
-      container.appendChild(btn);
+    cur.items.forEach(it=>{
+      const d=document.createElement('div');d.className='itinerary-item';d.innerHTML=buildItem(it,'導航');c.appendChild(d);
+      const d2=document.createElement('div');d2.className='itinerary-item';d2.innerHTML=buildItem(it,'開啟地圖');m.appendChild(d2);
     });
-    const label = document.getElementById('currentDayLabel');
-    if (label) label.textContent = '加入至：' + (appData.currentDay || '—');
   }
 
-  function buildItineraryItemHTML(item, mapText) {
-    const url = item.mapUrl || '#';
-    return `
-      <div class="place">
-        <span>📍 ${item.place}</span>
-        <a class="map-link" href="${url}" target="_blank" rel="noopener">🗺️ ${mapText}</a>
-      </div>
-      <div class="transport">🚇 ${item.transport || '無交通說明'}</div>
-    `;
-  }
-
-  function renderItineraryList() {
-    const container = document.getElementById('itineraryList');
-    const mapContainer = document.getElementById('mapItineraryList');
-    if (!container || !mapContainer) return;
-    container.innerHTML = '';
-    mapContainer.innerHTML = '';
-
-    const current = appData.days.find(d => d.name === appData.currentDay);
-    if (!current || current.items.length === 0) {
-      container.innerHTML = '<p style="font-size:13px;color:#b08a95;text-align:center;">✨ 尚無行程，快新增吧</p>';
-      mapContainer.innerHTML = '<p style="font-size:13px;color:#b08a95;text-align:center;">✨ 尚無地點</p>';
-      return;
+  // ---------- 同行者 ----------
+  function renderTravelers(){
+    const chips=document.getElementById('travelerChips');
+    const countEl=document.getElementById('travelerCount');
+    if(!chips)return;
+    chips.innerHTML='';
+    if(!appData.travelers.length){
+      chips.innerHTML='<div class="empty-travelers">尚未新增同行者，請用下方 ➕ 新增</div>';
+    }else{
+      appData.travelers.forEach((name,idx)=>{
+        const chip=document.createElement('div');
+        chip.className='traveler-chip';
+        chip.innerHTML=`<span>${escapeHtml(name)}</span><button class="minus" data-idx="${idx}" title="移除">−</button>`;
+        chips.appendChild(chip);
+      });
     }
-    current.items.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'itinerary-item';
-      div.innerHTML = buildItineraryItemHTML(item, '導航');
-      container.appendChild(div);
-
-      const mapDiv = document.createElement('div');
-      mapDiv.className = 'itinerary-item';
-      mapDiv.innerHTML = buildItineraryItemHTML(item, '開啟地圖');
-      mapContainer.appendChild(mapDiv);
-    });
+    if(countEl)countEl.textContent=`${appData.travelers.length} / ${MAX_TRAVELERS}`;
+    // 同步付款人下拉
+    renderPayerSelect();
   }
+
+  function renderPayerSelect(){
+    const sel=document.getElementById('expensePayer');
+    if(!sel)return;
+    const prev=sel.value;
+    sel.innerHTML='';
+    if(!appData.travelers.length){
+      const opt=document.createElement('option');
+      opt.value='';opt.textContent='（請先新增同行者）';
+      sel.appendChild(opt);
+      sel.disabled=true;
+    }else{
+      sel.disabled=false;
+      appData.travelers.forEach(n=>{
+        const opt=document.createElement('option');
+        opt.value=n;opt.textContent=n;
+        sel.appendChild(opt);
+      });
+      if(prev&&appData.travelers.includes(prev))sel.value=prev;
+    }
+  }
+
+  window.removeTraveler=function(idx){
+    const name=appData.travelers[idx];
+    if(!name)return;
+    const used=appData.expenses.some(e=>e.payer===name || (e.customSplit||[]).some(s=>s.name===name));
+    if(used){
+      if(!confirm(`「${name}」已出現在記帳記錄中，移除後下拉選單將不再顯示此名字，但舊記錄保留。確定移除？`))return;
+    }
+    appData.travelers.splice(idx,1);
+    saveData();
+  };
+
+  window.addTraveler=function(){
+    const input=document.getElementById('newTravelerName');
+    if(!input)return;
+    const name=input.value.trim();
+    if(!name){alert('請輸入名字');return;}
+    if(appData.travelers.length>=MAX_TRAVELERS){alert(`最多 ${MAX_TRAVELERS} 位同行者`);return;}
+    if(appData.travelers.includes(name)){alert('此名字已存在');return;}
+    appData.travelers.push(name);
+    input.value='';
+    saveData();
+  };
+
+  function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
   // ---------- 記帳 ----------
-  function renderExpenses() {
-    const container = document.getElementById('expenseList');
-    if (!container) return;
-    container.innerHTML = '';
-    if (!appData.expenses.length) {
-      container.innerHTML = '<p style="font-size:13px;color:#b08a95;text-align:center;">尚無記帳項目</p>';
-      return;
+  function renderExpenses(){
+    const c=document.getElementById('expenseList');
+    if(!c)return;
+    c.innerHTML='';
+    if(!appData.expenses.length){
+      c.innerHTML='<p style="font-size:13px;color:#b08a95;text-align:center;">尚無記帳項目</p>';
+    }else{
+      appData.expenses.forEach(exp=>{
+        const d=document.createElement('div');
+        d.className='expense-item';
+        const sd=exp.splitType==='equal'
+          ? `人均 ${(exp.total/(exp.customSplit&&exp.customSplit.length?exp.customSplit.length:1)).toFixed(2)} ${exp.currency}`
+          : (exp.customSplit||[]).map(s=>`${s.name}: ${s.amount}`).join(', ')+` ${exp.currency}`;
+        d.innerHTML=`
+          <div class="expense-header"><span class="expense-name">${escapeHtml(exp.name)}</span><span class="expense-amount">${exp.total} ${exp.currency}</span></div>
+          <div class="expense-detail">付款人：${escapeHtml(exp.payer)}｜${sd}｜${escapeHtml(exp.payMethod||'')}</div>
+          <div class="expense-actions"><button class="small secondary" onclick="deleteExpense(${JSON.stringify(exp.id)})">刪除</button></div>`;
+        c.appendChild(d);
+      });
     }
-    appData.expenses.forEach(exp => {
-      const div = document.createElement('div');
-      div.className = `expense-item ${exp.settled ? 'settled' : ''}`;
-      let splitDetail = exp.splitType === 'equal'
-        ? `人均 ${(exp.total / exp.participants).toFixed(2)} ${exp.currency}`
-        : (exp.customSplit || []).map(s => `${s.name}: ${s.amount}`).join(', ') + ` ${exp.currency}`;
-
-      div.innerHTML = `
-        <div class="expense-header">
-          <span class="expense-name">${exp.name} ${exp.settled ? '✅' : ''}</span>
-          <span class="expense-amount">${exp.total} ${exp.currency}</span>
-        </div>
-        <div class="expense-detail">付款人：${exp.payer}｜${splitDetail}｜${exp.payMethod}</div>
-        <div class="expense-actions">
-          <button class="small secondary" onclick="toggleSettle(${exp.id})">${exp.settled ? '取消結清' : '標記結清'}</button>
-          <button class="small secondary" onclick="deleteExpense(${exp.id})">刪除</button>
-        </div>
-      `;
-      container.appendChild(div);
-    });
+    renderSettlement();
   }
 
-  window.toggleSettle = function(id) {
-    const exp = appData.expenses.find(e => e.id === id);
-    if (exp) {
-      exp.settled = !exp.settled;
-      exp.settledAt = exp.settled ? new Date().toLocaleString('zh-HK') : '';
-      saveData();
+  window.deleteExpense=function(id){
+    if(!confirm('確定刪除此項目？')){
+      return;
     }
+    appData.expenses=appData.expenses.filter(x=>String(x.id)!==String(id));
+    saveData();
   };
 
-  window.deleteExpense = function(id) {
-    if (confirm('確定刪除此項目？')) {
-      appData.expenses = appData.expenses.filter(e => e.id !== id);
-      saveData();
-    }
-  };
-
-  function settleAll() {
-    const unsettled = appData.expenses.filter(e => !e.settled);
-    const resultEl = document.getElementById('settlementResult');
-    if (!unsettled.length) {
-      resultEl.innerHTML = '<p>沒有未結清的項目</p>';
+  function renderSettlement(){
+    const el=document.getElementById('settlementResult');
+    if(!el)return;
+    if(!appData.expenses.length){
+      el.innerHTML='<p style="color:#b08a95;text-align:center;">尚未有支出，暫無結算</p>';
       return;
     }
 
-    const balances = {};
-    unsettled.forEach(exp => {
-      const cur = exp.currency;
-      if (!balances[exp.payer]) balances[exp.payer] = { THB: 0, HKD: 0 };
-      balances[exp.payer][cur] += exp.total;
-      (exp.customSplit || []).forEach(s => {
-        if (!balances[s.name]) balances[s.name] = { THB: 0, HKD: 0 };
-        balances[s.name][cur] -= s.amount;
+    const balances={}; // name -> {THB, HKD}
+    const ensure=n=>{if(!balances[n])balances[n]={THB:0,HKD:0};};
+
+    appData.expenses.forEach(exp=>{
+      const cur=exp.currency||'THB';
+      if(!exp.customSplit||!exp.customSplit.length)return;
+      ensure(exp.payer);
+      balances[exp.payer][cur]+=exp.total;
+      exp.customSplit.forEach(s=>{
+        ensure(s.name);
+        balances[s.name][cur]-=s.amount;
       });
     });
 
-    const debtors = [], creditors = [];
-    Object.entries(balances).forEach(([name, bal]) => {
-      ['THB', 'HKD'].forEach(cur => {
-        const amt = bal[cur];
-        if (amt > 0.01) creditors.push({ name, cur, amount: amt });
-        else if (amt < -0.01) debtors.push({ name, cur, amount: -amt });
+    const debtors=[],creditors=[];
+    Object.entries(balances).forEach(([n,b])=>{
+      ['THB','HKD'].forEach(cur=>{
+        const a=Math.round(b[cur]*100)/100;
+        if(a>0.01)creditors.push({name:n,cur,amount:a});
+        else if(a<-0.01)debtors.push({name:n,cur,amount:-a});
       });
     });
 
-    let resultHtml = '<h4 style="font-size:14px; margin-bottom:8px;">💡 結算結果</h4>';
-    const detailsText = [];
-
-    if (!debtors.length && !creditors.length) {
-      resultHtml += '<p>所有帳目已平衡</p>';
-      detailsText.push('所有帳目已平衡');
-    } else {
-      debtors.forEach(d => {
-        creditors.forEach(c => {
-          if (d.cur === c.cur && d.amount > 0.01 && c.amount > 0.01) {
-            const pay = Math.min(d.amount, c.amount);
-            if (pay > 0.01) {
-              const line = `${d.name} 應該付 ${c.name} ${pay.toFixed(2)} ${d.cur}`;
-              resultHtml += `<p>${line}</p>`;
-              detailsText.push(line);
-              d.amount -= pay;
-              c.amount -= pay;
+    let html='';
+    if(!debtors.length&&!creditors.length){
+      html='<p style="text-align:center;">✨ 所有帳目已平衡</p>';
+    }else{
+      // 以金額大小排序，穩定輸出
+      debtors.sort((a,b)=>b.amount-a.amount);
+      creditors.sort((a,b)=>b.amount-a.amount);
+      debtors.forEach(d=>{
+        creditors.forEach(c=>{
+          if(d.cur===c.cur&&d.amount>0.01&&c.amount>0.01){
+            const pay=Math.min(d.amount,c.amount);
+            if(pay>0.01){
+              html+=`<p style="margin:4px 0;">💸 <b>${escapeHtml(d.name)}</b> 應該付 <b>${escapeHtml(c.name)}</b> ${pay.toFixed(2)} ${d.cur}</p>`;
+              d.amount-=pay;
+              c.amount-=pay;
             }
           }
         });
       });
+      if(!html)html='<p style="text-align:center;">✨ 所有帳目已平衡</p>';
     }
-
-    const now = new Date().toLocaleString('zh-HK');
-    unsettled.forEach(exp => { exp.settled = true; exp.settledAt = now; });
-    appData.settlementHistory.push({
-      date: now,
-      details: detailsText.length ? detailsText.join('；') : '無差額',
-      html: resultHtml
-    });
-
-    resultEl.innerHTML = resultHtml;
-    saveData();
+    el.innerHTML=html;
   }
 
-  function renderHistory() {
-    const container = document.getElementById('settlementHistory');
-    if (!container) return;
-    if (!appData.settlementHistory.length) { container.innerHTML = ''; return; }
-    let html = '<h4 style="font-size:14px; margin-bottom:8px;">📜 結清記錄</h4>';
-    appData.settlementHistory.forEach(h => {
-      const content = h.html || (h.details || '');
-      html += `
-        <div style="background:#fff; border-radius:12px; padding:10px; margin-bottom:8px; font-size:12px; border:1px solid #f0e4d8;">
-          <div style="color:#b89a8a; margin-bottom:4px;">🕒 ${h.date}</div>
-          <div>${content}</div>
-        </div>`;
-    });
-    container.innerHTML = html;
-  }
+  function addExpense(){
+    const name=document.getElementById('expenseName').value.trim();
+    const total=parseFloat(document.getElementById('expenseTotal').value);
+    const currency=document.getElementById('expenseCurrency').value;
+    const payMethod=document.getElementById('expensePayMethod').value;
+    const payer=document.getElementById('expensePayer').value;
+    const splitType=document.getElementById('splitType').value;
 
-  // ---------- 分頁 ----------
-  function switchTab(tabId) {
-    appData.activeTab = tabId;
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
-    const target = document.getElementById(`tab-${tabId}`);
-    if (target) target.classList.remove('hidden');
-    document.querySelectorAll('.nav-item').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === tabId);
-    });
-    saveData();
-  }
+    if(!appData.travelers.length){alert('請先新增同行者');return;}
+    if(!name||isNaN(total)||total<=0||!payer){alert('請填寫項目名稱、正確金額和付款人');return;}
 
-  // ---------- 新增行程 / 支出 ----------
-  function addItinerary() {
-    const placeEl = document.getElementById('placeName');
-    const mapEl = document.getElementById('placeMapUrl');
-    const transportEl = document.getElementById('placeTransport');
-    const place = placeEl.value.trim();
-    const mapUrl = mapEl.value.trim();
-    const transport = transportEl.value.trim();
-    if (!place) return alert('請輸入地點名稱');
-
-    let day = appData.days.find(d => d.name === appData.currentDay);
-    if (!day) {
-      day = { name: appData.currentDay || 'Day 1', items: [] };
-      appData.days.push(day);
-      appData.currentDay = day.name;
-    }
-    day.items.push({ place, mapUrl, transport });
-    placeEl.value = ''; mapEl.value = ''; transportEl.value = '';
-    saveData();
-  }
-
-  function addExpense() {
-    const name = document.getElementById('expenseName').value.trim();
-    const total = parseFloat(document.getElementById('expenseTotal').value);
-    const currency = document.getElementById('expenseCurrency').value;
-    const payMethod = document.getElementById('expensePayMethod').value;
-    const participants = parseInt(document.getElementById('expenseParticipants').value) || 1;
-    const payer = document.getElementById('expensePayer').value.trim();
-    const splitType = document.getElementById('splitType').value;
-
-    if (!name || isNaN(total) || total <= 0 || !payer) {
-      return alert('請填寫項目名稱、正確金額和付款人');
-    }
-
-    let customSplit = [];
-    if (splitType === 'custom') {
-      const raw = document.getElementById('customSplitInput').value.trim();
-      if (!raw) return alert('請輸入分開付的人名與金額');
-      for (const line of raw.split('\n')) {
-        if (!line.trim()) continue;
-        const parts = line.split(',');
-        if (parts.length < 2) return alert('格式錯誤，請使用「人名,金額」');
-        const pName = parts[0].trim();
-        const amt = parseFloat(parts[1].trim());
-        if (!pName || isNaN(amt)) return alert('格式錯誤，請使用「人名,金額」');
-        customSplit.push({ name: pName, amount: amt });
+    let customSplit=[];
+    if(splitType==='custom'){
+      const raw=document.getElementById('customSplitInput').value.trim();
+      if(!raw){alert('請輸入分開付的人名與金額');return;}
+      for(const line of raw.split('\n')){
+        if(!line.trim())continue;
+        const parts=line.split(',');
+        if(parts.length<2){alert('格式錯誤，請使用「人名,金額」');return;}
+        const p=parts[0].trim(),a=parseFloat(parts[1].trim());
+        if(!p||isNaN(a)){alert('格式錯誤，請使用「人名,金額」');return;}
+        customSplit.push({name:p,amount:a});
       }
-    } else {
-      const namesRaw = prompt('請輸入參與者名字（逗號分隔），例如：A,B', 'A,B');
-      if (!namesRaw) return;
-      const names = namesRaw.split(',').map(s => s.trim()).filter(Boolean);
-      if (names.length !== participants) {
-        if (!confirm(`參與人數為 ${participants}，但輸入了 ${names.length} 個名字，仍要繼續嗎？`)) return;
-      }
-      const per = total / participants;
-      customSplit = names.map(n => ({ name: n, amount: per }));
+    }else{
+      // 人均：用全部同行者
+      const per=total/appData.travelers.length;
+      customSplit=appData.travelers.map(n=>({name:n,amount:Math.round(per*100)/100}));
     }
 
     appData.expenses.push({
-      id: Date.now(), name, total, currency, payMethod,
-      participants, payer, splitType, customSplit,
-      settled: false, settledAt: ''
+      id:Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      name,total,currency,payMethod,payer,splitType,customSplit
     });
-
-    document.getElementById('expenseName').value = '';
-    document.getElementById('expenseTotal').value = '';
-    document.getElementById('customSplitInput').value = '';
+    document.getElementById('expenseName').value='';
+    document.getElementById('expenseTotal').value='';
+    document.getElementById('customSplitInput').value='';
     saveData();
   }
 
   // ---------- 文件 ----------
-  function formatSize(bytes) {
-    if (!bytes || bytes <= 0) return '0 B';
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / 1024 / 1024).toFixed(2) + ' MB';
-  }
-
-  function renderFiles() {
-    const container = document.getElementById('fileList');
-    if (!container) return;
-    container.innerHTML = '';
-    if (!appData.files.length) {
-      container.innerHTML = '<p style="font-size:13px;color:#b08a95;text-align:center;">尚未上載文件</p>';
-      return;
-    }
-
-    appData.files.slice().reverse().forEach(f => {
-      const isImage = (f.type || '').startsWith('image/');
-      const isPDF = (f.type === 'application/pdf') || (f.name || '').toLowerCase().endsWith('.pdf');
-      const icon = isImage ? '🖼️' : (isPDF ? '📄' : '📎');
-
-      const div = document.createElement('div');
-      div.className = 'file-item';
-      div.innerHTML = `
+  function renderFiles(){
+    const c=document.getElementById('fileList');
+    if(!c)return;
+    c.innerHTML='';
+    if(!appData.files.length){c.innerHTML='<p style="font-size:13px;color:#b08a95;text-align:center;">尚未上載文件</p>';return;}
+    appData.files.slice().reverse().forEach(f=>{
+      const isImg=(f.type||'').startsWith('image/');
+      const isPdf=(f.type==='application/pdf')||(f.name||'').toLowerCase().endsWith('.pdf');
+      const icon=isImg?'🖼️':(isPdf?'📄':'📎');
+      const d=document.createElement('div');
+      d.className='file-item';
+      d.innerHTML=`
         <div class="file-thumb" id="thumb_${f.id}">${icon}</div>
-        <div class="file-info">
-          <div class="file-name" title="${f.name}">${f.name}</div>
-          <div class="file-meta">${formatSize(f.size)}・${f.uploadedAt}</div>
-        </div>
-        <div class="file-actions">
-          <button class="small secondary" onclick="previewFile('${f.id}')">查看</button>
-          <button class="small secondary" onclick="deleteFile('${f.id}')">刪除</button>
-        </div>
-      `;
-      container.appendChild(div);
-
-      if (isImage) {
-        getFileObjectURL(f).then(url => {
-          if (!url) return;
-          const thumb = document.getElementById('thumb_' + f.id);
-          if (thumb) {
-            thumb.innerHTML = '';
-            const img = document.createElement('img');
-            img.src = url;
-            img.className = 'file-thumb-img';
-            img.alt = f.name;
-            thumb.appendChild(img);
+        <div class="file-info"><div class="file-name" title="${escapeHtml(f.name)}">${escapeHtml(f.name)}${f.cloudPath?' ☁️':''}</div><div class="file-meta">${formatSize(f.size)}・${f.uploadedAt}</div></div>
+        <div class="file-actions"><button class="small secondary" onclick="previewFile('${f.id}')">查看</button><button class="small secondary" onclick="deleteFile('${f.id}')">刪除</button></div>`;
+      c.appendChild(d);
+      if(isImg){
+        getFileObjectURL(f).then(url=>{
+          if(!url&&f.cloudPath&&supabaseClient){
+            const {data}=supabaseClient.storage.from('files').getPublicUrl(f.cloudPath);
+            url=data&&data.publicUrl;
           }
+          if(!url)return;
+          const t=document.getElementById('thumb_'+f.id);
+          if(t){t.innerHTML='';const im=document.createElement('img');im.src=url;im.className='file-thumb-img';im.alt=f.name;t.appendChild(im);}
         });
       }
     });
   }
 
-  window.previewFile = async function(id) {
-    const meta = appData.files.find(f => f.id === id);
-    if (!meta) return;
-    const url = await getFileObjectURL(meta);
-    if (!url) return alert('讀取檔案失敗，可能已被瀏覽器清除');
-    window.open(url, '_blank');
+  function formatSize(b){if(!b||b<=0)return'0 B';if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(2)+' MB';}
+
+  window.previewFile=async function(id){
+    const meta=appData.files.find(f=>String(f.id)===String(id));
+    if(!meta)return;
+    try{const u=await getFileObjectURL(meta);if(u){window.open(u,'_blank');return;}}catch(e){}
+    if(meta.cloudPath&&supabaseClient){
+      const {data}=supabaseClient.storage.from('files').getPublicUrl(meta.cloudPath);
+      if(data&&data.publicUrl){window.open(data.publicUrl,'_blank');return;}
+    }
+    alert('讀取檔案失敗，可能已被清除');
   };
 
-  window.deleteFile = async function(id) {
-    if (!confirm('確定刪除此文件？')) return;
-    if (fileUrlCache.has(id)) {
-      URL.revokeObjectURL(fileUrlCache.get(id));
-      fileUrlCache.delete(id);
+  window.deleteFile=async function(id){
+    if(!confirm('確定刪除此文件？'))return;
+    const meta=appData.files.find(f=>String(f.id)===String(id));
+    if(fileUrlCache.has(id)){URL.revokeObjectURL(fileUrlCache.get(id));fileUrlCache.delete(id);}
+    try{await deleteFileFromDB(id);}catch(e){}
+    if(meta&&meta.cloudPath&&supabaseClient){
+      try{await supabaseClient.storage.from('files').remove([meta.cloudPath]);}catch(e){}
     }
-    try { await deleteFileFromDB(id); } catch (e) { console.warn(e); }
-    appData.files = appData.files.filter(f => f.id !== id);
+    appData.files=appData.files.filter(f=>String(f.id)!==String(id));
     saveData();
   };
 
-  async function handleFileUpload(files) {
-    if (!files || !files.length) return;
-    let success = 0;
-    for (const file of files) {
-      if (file.size > 20 * 1024 * 1024) {
-        alert(`檔案「${file.name}」超過 20MB，已跳過`);
-        continue;
-      }
-      const id = 'file_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-      try {
-        await saveFileToDB(id, file);
-        appData.files.push({
-          id,
-          name: file.name,
-          type: file.type || '',
-          size: file.size,
-          uploadedAt: new Date().toLocaleString('zh-HK')
-        });
-        success++;
-      } catch (e) {
-        console.error(e);
-        alert('儲存檔案失敗：' + file.name + '\n（可能瀏覽器不支援或空間不足）');
-      }
+  async function handleFileUpload(files){
+    if(!files||!files.length)return;
+    let n=0;
+    for(const file of files){
+      if(file.size>20*1024*1024){alert(`檔案「${file.name}」超過 20MB，已跳過`);continue;}
+      const id='file_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
+      try{
+        await saveFileToDB(id,file);
+        let cloudPath=null;
+        if(supabaseClient&&syncConfig.enabled){
+          try{
+            const path=`${syncConfig.syncId}/${id}`;
+            const {error}=await supabaseClient.storage.from('files').upload(path,file,{upsert:true,contentType:file.type});
+            if(!error)cloudPath=path;
+          }catch(e){console.warn('上傳雲端失敗',e);}
+        }
+        appData.files.push({id,name:file.name,type:file.type||'',size:file.size,uploadedAt:new Date().toLocaleString('zh-HK'),cloudPath});
+        n++;
+      }catch(e){console.error(e);alert('儲存檔案失敗：'+file.name);}
     }
-    if (success > 0) saveData();
+    if(n>0)saveData();
   }
 
-  // ---------- 渲染全部 ----------
-  function renderAll() {
+  // ---------- 分頁 ----------
+  function switchTab(tabId){
+    appData.activeTab=tabId;
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.add('hidden'));
+    const t=document.getElementById(`tab-${tabId}`);if(t)t.classList.remove('hidden');
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===tabId));
+    saveData();
+  }
+
+  // ---------- 新增行程 ----------
+  function addItinerary(){
+    const pe=document.getElementById('placeName'),me=document.getElementById('placeMapUrl'),te=document.getElementById('placeTransport');
+    const place=pe.value.trim(),mapUrl=me.value.trim(),transport=te.value.trim();
+    if(!place)return alert('請輸入地點名稱');
+    let day=appData.days.find(d=>d.name===appData.currentDay);
+    if(!day){day={name:appData.currentDay||'Day 1',items:[]};appData.days.push(day);appData.currentDay=day.name;}
+    day.items.push({place,mapUrl,transport});
+    pe.value='';me.value='';te.value='';saveData();
+  }
+
+  // ---------- ZIP 備份 ----------
+  function setBackupStatus(m){const el=document.getElementById('backupStatus');if(el)el.textContent=m||'';}
+
+  async function exportAll(){
+    const btn=document.getElementById('exportBtn');btn.disabled=true;setBackupStatus('正在打包資料…');
+    try{
+      const zip=new JSZip();
+      const meta={exportedAt:new Date().toLocaleString('zh-HK'),days:appData.days,currentDay:appData.currentDay,travelers:appData.travelers,expenses:appData.expenses,files:appData.files,activeTab:'itinerary'};
+      zip.file('data.json',JSON.stringify(meta,null,2));
+      const folder=zip.folder('files');
+      for(const f of appData.files){try{const b=await getFileFromDB(f.id);if(b)folder.file(f.id,b);}catch(e){}}
+      setBackupStatus('正在產生 ZIP…');
+      const c=await zip.generateAsync({type:'blob'});
+      const url=URL.createObjectURL(c);
+      const a=document.createElement('a');
+      const stamp=new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+      a.href=url;a.download=`travel-backup-${stamp}.zip`;
+      document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),3000);
+      setBackupStatus('✅ 匯出完成！');
+    }catch(e){console.error(e);setBackupStatus('❌ 匯出失敗：'+(e.message||''));}
+    finally{btn.disabled=false;}
+  }
+
+  async function importAll(file){
+    if(!file)return;
+    if(!confirm('匯入會覆蓋目前所有資料，確定？'))return;
+    const btn=document.getElementById('importBtn');btn.disabled=true;setBackupStatus('正在讀取 ZIP…');
+    try{
+      const zip=await JSZip.loadAsync(file);
+      const de=zip.file('data.json');
+      if(!de)throw new Error('搵唔到 data.json');
+      const meta=JSON.parse(await de.async('string'));
+      appData.days=Array.isArray(meta.days)?meta.days:[];
+      appData.currentDay=meta.currentDay||(appData.days[0]?appData.days[0].name:'');
+      appData.travelers=Array.isArray(meta.travelers)&&meta.travelers.length?meta.travelers.slice(0,MAX_TRAVELERS):['A','B'];
+      appData.expenses=Array.isArray(meta.expenses)?meta.expenses:[];
+      appData.files=Array.isArray(meta.files)?meta.files:[];
+      appData.activeTab='itinerary';
+      fileUrlCache.forEach(u=>URL.revokeObjectURL(u));fileUrlCache.clear();
+      setBackupStatus('正在還原文件…');
+      let n=0;
+      for(const f of appData.files){
+        const zf=zip.file('files/'+f.id);
+        if(!zf)continue;
+        try{const b=await zf.async('blob');await saveFileToDB(f.id,b);n++;}catch(e){}
+      }
+      saveData();
+      setBackupStatus(`✅ 已還原 ${n} 個檔案、${appData.days.length} 天、${appData.expenses.length} 筆記帳`);
+    }catch(e){console.error(e);setBackupStatus('❌ 匯入失敗：'+(e.message||''));}
+    finally{btn.disabled=false;const i=document.getElementById('importInput');if(i)i.value='';}
+  }
+
+  // ---------- 全渲染 ----------
+  function renderAll(){
     renderDayTabs();
     renderItineraryList();
+    renderTravelers();
     renderExpenses();
-    renderHistory();
     renderFiles();
-
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
-    const activeTab = appData.activeTab || 'itinerary';
-    const target = document.getElementById(`tab-${activeTab}`);
-    if (target) target.classList.remove('hidden');
-    document.querySelectorAll('.nav-item').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.tab === activeTab);
-    });
+    document.querySelectorAll('.tab-pane').forEach(p=>p.classList.add('hidden'));
+    const at=appData.activeTab||'itinerary';
+    const t=document.getElementById(`tab-${at}`);if(t)t.classList.remove('hidden');
+    document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.tab===at));
   }
 
-  // ---------- 事件 ----------
-  document.querySelectorAll('.nav-item').forEach(btn => {
-    btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-  });
+  // ---------- 同步 UI ----------
+  function initSyncUI(){
+    document.getElementById('syncUrl').value=syncConfig.url||'';
+    document.getElementById('syncKey').value=syncConfig.key||'';
+    document.getElementById('syncId').value=syncConfig.syncId||'';
+    if(syncConfig.enabled)setSyncStatus('🟢 雲端同步已啟用');
 
-  document.getElementById('addItineraryBtn').addEventListener('click', addItinerary);
-
-  document.getElementById('addDayBtn').addEventListener('click', function() {
-    const el = document.getElementById('newDayName');
-    const name = el.value.trim();
-    if (!name) return alert('請輸入日期名稱');
-    if (appData.days.some(d => d.name === name)) return alert('日期已存在');
-    appData.days.push({ name, items: [] });
-    appData.currentDay = name;
-    el.value = '';
-    saveData();
-  });
-
-  document.getElementById('addExpenseBtn').addEventListener('click', addExpense);
-
-  document.getElementById('splitType').addEventListener('change', function() {
-    const customDiv = document.getElementById('customSplitContainer');
-    if (this.value === 'custom') customDiv.classList.remove('hidden');
-    else customDiv.classList.add('hidden');
-  });
-
-  document.getElementById('settleAllBtn').addEventListener('click', settleAll);
-
-  // 文件上載
-  const uploadZone = document.getElementById('uploadZone');
-  const fileInput = document.getElementById('fileInput');
-  if (uploadZone && fileInput) {
-    uploadZone.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', async function() {
-      await handleFileUpload(Array.from(this.files || []));
-      this.value = '';
+    document.getElementById('saveSyncConfigBtn').addEventListener('click',async()=>{
+      const url=document.getElementById('syncUrl').value.trim();
+      const key=document.getElementById('syncKey').value.trim();
+      const sid=document.getElementById('syncId').value.trim();
+      if(!url||!key||!sid)return alert('請填寫全部三個欄位');
+      if(!url.startsWith('https://'))return alert('URL 必須以 https:// 開頭');
+      syncConfig={url,key,syncId:sid,enabled:true};
+      saveSyncConfig();
+      initSupabase();
+      if(!supabaseClient)return;
+      setSyncStatus('⏳ 連線測試中…');
+      try{
+        const {data,error}=await supabaseClient.from('trips').select('id').eq('id',sid).maybeSingle();
+        if(error)throw error;
+        if(data){
+          await pullFromCloud(false);
+        }else{
+          await pushToCloud(false);
+        }
+      }catch(e){
+        console.error(e);
+        setSyncStatus('❌ 連線失敗，請檢查 URL / key / SQL 是否已建立');
+      }
     });
-    uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.background = '#f5ece2'; });
-    uploadZone.addEventListener('dragleave', () => { uploadZone.style.background = ''; });
-    uploadZone.addEventListener('drop', async e => {
-      e.preventDefault();
-      uploadZone.style.background = '';
-      await handleFileUpload(Array.from(e.dataTransfer.files || []));
+
+    document.getElementById('disableSyncBtn').addEventListener('click',()=>{
+      if(!confirm('確定關閉雲端同步？'))return;
+      syncConfig.enabled=false;saveSyncConfig();supabaseClient=null;
+      setSyncStatus('⚪️ 雲端同步已關閉，只使用本機儲存');
     });
+
+    document.getElementById('pushBtn').addEventListener('click',async()=>{
+      if(!supabaseClient)return alert('請先儲存並連線');
+      await pushToCloud(false);
+    });
+
+    document.getElementById('pullBtn').addEventListener('click',async()=>{
+      if(!supabaseClient)return alert('請先儲存並連線');
+      if(!confirm('會以雲端資料覆蓋本機，確定？'))return;
+      await pullFromCloud(false);
+    });
+
+    document.getElementById('exportBtn').addEventListener('click',exportAll);
+    document.getElementById('importBtn').addEventListener('click',()=>document.getElementById('importInput').click());
+    document.getElementById('importInput').addEventListener('change',function(){const f=this.files&&this.files[0];if(f)importAll(f);});
   }
 
   // ---------- 啟動 ----------
-  window.addEventListener('load', function() {
+  window.addEventListener('load',async function(){
+    loadSyncConfig();
     loadData();
+    initSupabase();
+    initSyncUI();
     renderAll();
+
+    // 導航
+    document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+
+    // 行程
+    document.getElementById('addItineraryBtn').addEventListener('click',addItinerary);
+    document.getElementById('addDayBtn').addEventListener('click',function(){
+      const el=document.getElementById('newDayName');
+      const name=el.value.trim();
+      if(!name)return alert('請輸入日期名稱');
+      if(appData.days.some(d=>d.name===name))return alert('日期已存在');
+      appData.days.push({name,items:[]});appData.currentDay=name;el.value='';saveData();
+    });
+
+    // 同行者
+    document.getElementById('addTravelerBtn').addEventListener('click',addTraveler);
+    document.getElementById('newTravelerName').addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();addTraveler();}
+    });
+    // chips 用事件委派處理減號
+    document.getElementById('travelerChips').addEventListener('click',e=>{
+      const btn=e.target.closest('.minus');
+      if(btn){removeTraveler(parseInt(btn.dataset.idx,10));}
+    });
+
+    // 支出
+    document.getElementById('addExpenseBtn').addEventListener('click',addExpense);
+    document.getElementById('splitType').addEventListener('change',function(){
+      const d=document.getElementById('customSplitContainer');
+      if(this.value==='custom')d.classList.remove('hidden');else d.classList.add('hidden');
+    });
+
+    // 文件
+    const uz=document.getElementById('uploadZone'),fi=document.getElementById('fileInput');
+    if(uz&&fi){
+      uz.addEventListener('click',()=>fi.click());
+      fi.addEventListener('change',async function(){await handleFileUpload(Array.from(this.files||[]));this.value='';});
+      uz.addEventListener('dragover',e=>{e.preventDefault();uz.style.background='#f5ece2';});
+      uz.addEventListener('dragleave',()=>{uz.style.background='';});
+      uz.addEventListener('drop',async e=>{e.preventDefault();uz.style.background='';await handleFileUpload(Array.from(e.dataTransfer.files||[]));});
+    }
+
+    // 雲端檢查
+    if(supabaseClient){
+      setTimeout(()=>pullIfCloudNewer(),1500);
+    }
   });
 </script>
 </body>
