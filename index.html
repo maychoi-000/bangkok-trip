@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>🌸 米白日系・曼谷旅の手帳</title>
+  <title>曼谷旅の手帳</title>
   <style>
     * {
       margin: 0;
@@ -292,10 +292,6 @@
       border: 1px dashed #ffb6c9;
     }
 
-    .rate-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .rate-row input { text-align: center; }
-    .rate-arrow { color: #ffb6c9; font-weight: 600; font-size: 18px; }
-
     .hidden { display: none !important; }
 
     .bottom-nav {
@@ -312,11 +308,11 @@
       flex-direction: column;
       align-items: center;
       gap: 2px;
-      font-size: 9px;
+      font-size: 10px;
       color: #b89a8a;
       background: none;
       border: none;
-      padding: 4px 6px;
+      padding: 4px 10px;
       border-radius: 20px;
       box-shadow: none;
     }
@@ -327,7 +323,7 @@
       background: #f7ede4;
     }
 
-    .nav-item i { font-size: 19px; line-height: 1; }
+    .nav-item i { font-size: 20px; line-height: 1; }
     .nav-item:active { transform: scale(0.94); background: #f5ece2; }
 
     .hint {
@@ -528,31 +524,6 @@
       </div>
     </div>
 
-    <!-- 匯率 -->
-    <div id="tab-rate" class="tab-pane hidden">
-      <div class="card">
-        <div class="card-title"><i>💱</i> 日圓 ↔ 港幣 換算</div>
-        <div class="rate-row">
-          <span style="font-size:14px;">🇯🇵 JPY</span>
-          <input type="number" id="jpyInput" placeholder="日圓" step="0.01">
-          <span class="rate-arrow">⇄</span>
-          <span style="font-size:14px;">🇭🇰 HKD</span>
-        </div>
-        <div class="rate-row">
-          <input type="number" id="hkdInput" placeholder="港幣" step="0.01">
-        </div>
-        <div class="form-row" style="margin-top:12px;">
-          <label>匯率設定 (1 HKD = ? JPY)</label>
-          <input type="number" id="rateSetting" value="20.5" step="0.01">
-          <p class="hint" style="text-align:left; margin-top:4px;">預設 1 HKD = 20.5 JPY</p>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title"><i>📊</i> 目前匯率</div>
-        <p style="font-size:14px; color:#b85c7a; text-align:center;" id="currentRateDisplay">1 HKD = 20.5 JPY</p>
-      </div>
-    </div>
-
     <!-- 文件 -->
     <div id="tab-files" class="tab-pane hidden">
       <div class="card">
@@ -578,7 +549,6 @@
     <button class="nav-item active" data-tab="itinerary"><i>📅</i> 行程</button>
     <button class="nav-item" data-tab="map"><i>🗺️</i> 地圖</button>
     <button class="nav-item" data-tab="expense"><i>💰</i> 記帳</button>
-    <button class="nav-item" data-tab="rate"><i>💱</i> 匯率</button>
     <button class="nav-item" data-tab="files"><i>📁</i> 文件</button>
   </div>
 </div>
@@ -644,11 +614,9 @@
     expenses: [],
     settlementHistory: [],
     files: [],
-    rate: 20.5,
     activeTab: 'itinerary'
   };
 
-  let rateSaveTimer = null;
   const fileUrlCache = new Map(); // id -> objectURL
 
   function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
@@ -728,7 +696,6 @@
       if (!Array.isArray(appData.expenses)) appData.expenses = [];
       if (!Array.isArray(appData.settlementHistory)) appData.settlementHistory = [];
       if (!Array.isArray(appData.files)) appData.files = [];
-      if (!appData.rate || isNaN(appData.rate)) appData.rate = 20.5;
 
       if (appData.days.length === 0) {
         appData.days = clone(BANGKOK_DAYS);
@@ -737,6 +704,13 @@
       if (!appData.currentDay || !appData.days.some(d => d.name === appData.currentDay)) {
         appData.currentDay = appData.days[0].name;
       }
+
+      // 若舊存檔的 activeTab 為已刪除的 'rate'，回退到行程頁
+      const validTabs = ['itinerary', 'map', 'expense', 'files'];
+      if (!validTabs.includes(appData.activeTab)) {
+        appData.activeTab = 'itinerary';
+      }
+
       renderAll();
     } else {
       let legacy = null;
@@ -748,7 +722,6 @@
       appData.days = clone(BANGKOK_DAYS);
       appData.currentDay = appData.days[0].name;
       appData.activeTab = 'itinerary';
-      appData.rate = (legacy && legacy.rate) ? legacy.rate : 20.5;
       appData.files = [];
       appData.expenses = (legacy && Array.isArray(legacy.expenses) && legacy.expenses.length)
         ? legacy.expenses
@@ -960,43 +933,6 @@
     container.innerHTML = html;
   }
 
-  // ---------- 匯率 ----------
-  function updateRateDisplay() {
-    const el = document.getElementById('currentRateDisplay');
-    if (el) el.innerText = `1 HKD = ${appData.rate} JPY`;
-  }
-
-  function initRateInputs() {
-    const rateInput = document.getElementById('rateSetting');
-    if (rateInput) rateInput.value = appData.rate;
-    const jpyInput = document.getElementById('jpyInput');
-    const hkdInput = document.getElementById('hkdInput');
-
-    if (jpyInput) {
-      jpyInput.addEventListener('input', function() {
-        const jpy = parseFloat(this.value);
-        hkdInput.value = !isNaN(jpy) ? (jpy / appData.rate).toFixed(2) : '';
-      });
-    }
-    if (hkdInput) {
-      hkdInput.addEventListener('input', function() {
-        const hkd = parseFloat(this.value);
-        jpyInput.value = !isNaN(hkd) ? (hkd * appData.rate).toFixed(2) : '';
-      });
-    }
-    if (rateInput) {
-      rateInput.addEventListener('input', function() {
-        const v = parseFloat(this.value);
-        if (!isNaN(v) && v > 0) {
-          appData.rate = v;
-          updateRateDisplay();
-          clearTimeout(rateSaveTimer);
-          rateSaveTimer = setTimeout(() => saveData(), 500);
-        }
-      });
-    }
-  }
-
   // ---------- 分頁 ----------
   function switchTab(tabId) {
     appData.activeTab = tabId;
@@ -1184,7 +1120,6 @@
     renderDayTabs();
     renderItineraryList();
     renderExpenses();
-    updateRateDisplay();
     renderHistory();
     renderFiles();
 
@@ -1234,7 +1169,6 @@
       await handleFileUpload(Array.from(this.files || []));
       this.value = '';
     });
-    // 拖放支援
     uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.background = '#f5ece2'; });
     uploadZone.addEventListener('dragleave', () => { uploadZone.style.background = ''; });
     uploadZone.addEventListener('drop', async e => {
@@ -1247,7 +1181,6 @@
   // ---------- 啟動 ----------
   window.addEventListener('load', function() {
     loadData();
-    initRateInputs();
     renderAll();
   });
 </script>
